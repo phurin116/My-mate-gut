@@ -220,6 +220,15 @@ export default function Browse() {
         </Button>
       </div>
 
+      {/* Phones: the most used filters are one tap away without opening the sheet. */}
+      <div className="quick-filters" role="group" aria-label={b.groups.more}>
+        {TOGGLES.map((k) => (
+          <Chip key={k} on={f.toggles[k]} onClick={() => set({ ...f, toggles: { ...f.toggles, [k]: !f.toggles[k] } })}>
+            {b.quick[k]}
+          </Chip>
+        ))}
+      </div>
+
       <div className="browse-layout">
         <aside className="browse-side" aria-label={b.filters}>
           <div className="spread" style={{ marginBottom: 12 }}>
@@ -259,7 +268,7 @@ export default function Browse() {
           {count > 0 && (
             <div className="active-filters">
               {TOGGLES.filter((k) => f.toggles[k]).map((k) => (
-                <button key={k} type="button" className="chip is-on" onClick={() => set({ ...f, toggles: { ...f.toggles, [k]: false } })}>
+                <button key={k} type="button" className="chip is-on is-toggle" onClick={() => set({ ...f, toggles: { ...f.toggles, [k]: false } })}>
                   {b.quick[k]} <X size={13} aria-hidden="true" />
                 </button>
               ))}

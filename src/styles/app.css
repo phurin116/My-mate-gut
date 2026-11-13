@@ -409,6 +409,12 @@
   letter-spacing: -0.01em;
 }
 
+@media (max-width: 639px) {
+  .page-head > .grow {
+    flex-basis: 100%;
+  }
+}
+
 .page-head .eyebrow {
   margin-bottom: 6px;
 }
@@ -1015,6 +1021,23 @@
   min-height: 48px;
 }
 
+.quick-filters {
+  display: flex;
+  gap: var(--s-2);
+  margin: calc(var(--s-3) * -1) calc(var(--s-4) * -1) var(--s-4);
+  padding: 2px var(--s-4) 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.quick-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-filters .chip {
+  flex-shrink: 0;
+}
+
 .browse-layout {
   display: block;
 }
@@ -1098,7 +1121,15 @@
     min-height: 32px;
     padding: 0 12px;
   }
-  .browse-filter-btn {
+  .browse-filter-btn,
+  .quick-filters {
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  /* The quick row already shows these toggles as pressed. */
+  .active-filters .is-toggle {
     display: none;
   }
 }
@@ -1892,6 +1923,16 @@ a.stat:hover {
 
 .manage-item > .grow {
   flex-basis: 260px;
+}
+
+@media (max-width: 759px) {
+  .manage-item > .grow {
+    flex-basis: 100%;
+  }
+  .manage-count {
+    padding-left: 0;
+    margin-right: auto;
+  }
 }
 
 .applicant-list {

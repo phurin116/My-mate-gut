@@ -89,8 +89,7 @@ export function StartupDashboard() {
                 </div>
                 <Link to={`/startup/listings/${l.id}/applicants`} className="manage-count">
                   <Users size={16} aria-hidden="true" />
-                  <strong>{apps.length}</strong>
-                  <span className="muted">{s.viewApplicants.toLowerCase()}</span>
+                  <span>{t.biz.applicants.count(apps.length)}</span>
                   {fresh > 0 && <span className="tag tag-blue">{s.newCount(fresh)}</span>}
                 </Link>
                 <div className="row-wrap manage-actions">
