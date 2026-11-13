@@ -1,0 +1,7 @@
+# Netlify deploy settings. Connect this repository in Netlify and it builds automatically.
+[build]
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

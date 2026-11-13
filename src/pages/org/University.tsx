@@ -76,7 +76,7 @@ export default function University() {
       )
     : 0;
 
-  const exportCsv = () => {
+  const exportCsv = async () => {
     const rows: (string | number)[][] = [
       ['Section', 'Item', 'Value'],
       ...metrics.map(([k, v]) => ['Summary', k, v]),
@@ -84,10 +84,29 @@ export default function University() {
       ...byStartup.map((x) => ['Applications by startup', x.startup.name, x.count]),
     ];
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const filename = `placement-report-${nowISO().slice(0, 10)}.csv`;
+
+    // Inside the Claude artifact viewer, files must be offered through its downloads capability.
+    const host = (window as unknown as { claude?: { use?: (name: string) => Promise<unknown> } }).claude;
+    if (host?.use) {
+      const downloads = (await host.use('downloads')) as {
+        save: (r: { filename: string; data: string }) => Promise<unknown>;
+      } | null;
+      if (downloads) {
+        try {
+          await downloads.save({ filename, data: csv });
+          toast(u.exported);
+        } catch (e) {
+          if ((e as { code?: string })?.code !== 'declined') toast(u.exportFailed, { kind: 'error' });
+        }
+        return;
+      }
+    }
+
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `placement-report-${nowISO().slice(0, 10)}.csv`;
+    link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
     toast(u.exported);

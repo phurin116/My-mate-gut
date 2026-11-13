@@ -15,6 +15,17 @@ npm run preview  # serve the production build
 
 The build uses hash routing and a relative base path, so `dist/` can be hosted on any static host without rewrite rules.
 
+## Put it online as "my-mate-gut"
+
+The repository includes `netlify.toml`, so Netlify can build and host it with no extra settings.
+
+1. Sign in at https://app.netlify.com with your GitHub account.
+2. Choose **Add new site → Import an existing project → GitHub**, then pick `My-mate-gut`.
+3. Set the branch to deploy (`main` after this work is merged, or `claude/vibrant-gates-6z9s64`) and click **Deploy**.
+4. Open **Site configuration → Change site name** and enter `my-mate-gut`. The site is then at `https://my-mate-gut.netlify.app` if that name is free.
+
+Every push to that branch redeploys the site automatically.
+
 ## Demo accounts
 
 Open **Sign in** and pick one:

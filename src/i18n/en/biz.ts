@@ -168,6 +168,7 @@ export const biz = {
     asOf: (date: string) => `As of ${date}`,
     export: 'Export CSV',
     exported: 'Report downloaded.',
+    exportFailed: 'The report could not be downloaded here. Try again from a regular browser.',
     privacy:
       'This report shows totals only. Individual student activity is not shared with the university without the student\'s consent.',
     metrics: {
