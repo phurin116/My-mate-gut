@@ -1,5 +1,5 @@
 import { lazy, Suspense, type ReactNode } from 'react';
-import { createHashRouter, RouterProvider } from 'react-router';
+import { createHashRouter, createMemoryRouter, RouterProvider } from 'react-router';
 import { Layout, RequireRole, RequireUser } from './components/Layout';
 import { ButtonLink, EmptyState, Skeleton, ToastProvider } from './components/ui';
 import { Compass } from 'lucide-react';
@@ -58,7 +58,10 @@ function NotFound() {
 }
 
 
-const router = createHashRouter([
+// Embedded previews (sandboxed frames) cannot change the URL, so they route in memory.
+const createRouter = import.meta.env.VITE_ROUTER === 'memory' ? createMemoryRouter : createHashRouter;
+
+const router = createRouter([
   {
     // The toast provider sits inside the router because toasts can contain links.
     element: (
