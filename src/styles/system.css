@@ -9,37 +9,38 @@
  */
 
 :root {
-  /* Colour: warm paper surfaces, ink text, one deep green for action and trust */
-  --paper: #f6f3ec;
-  --paper-2: #ece8dc;
-  --paper-3: #e0dbcc;
-  --surface: #fffefa;
-  --ink: #171a18;
-  --ink-2: #3b403c;
-  --muted: #5f645d;
-  --line: rgba(23, 26, 24, 0.12);
-  --line-strong: rgba(23, 26, 24, 0.24);
+  /* Colour: white surfaces, near-black text, one blue for action, selection and trust */
+  --paper: #ffffff;
+  --paper-2: #f8fafc;
+  --paper-3: #e5e7eb;
+  --surface: #ffffff;
+  --ink: #111111;
+  --ink-2: #334155;
+  --muted: #64748b;
+  --line: #e5e7eb;
+  --line-strong: #cbd5e1;
 
-  --green: #17493f;
-  --green-dark: #0f342d;
-  --green-mid: #2c6b5b;
-  --green-tint: #e3eee8;
-  --green-tint-2: #cfe2d8;
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --brand-mid: #2563eb;
+  --brand-tint: #eff6ff;
+  --brand-tint-2: #dbeafe;
 
-  --clay: #b4491f;
-  --clay-tint: #f7e6dc;
-  --amber: #8a5a00;
-  --amber-tint: #f6ecd2;
-  --red: #a3301f;
-  --red-tint: #f8e1dc;
-  --blue: #23527a;
-  --blue-tint: #e1ebf3;
-  --slate-tint: #e8e8e2;
+  /* Semantic colours, used only for urgency and warnings */
+  --clay: #c2410c;
+  --clay-tint: #fff7ed;
+  --amber: #a16207;
+  --amber-tint: #fefce8;
+  --red: #b91c1c;
+  --red-tint: #fef2f2;
+  --blue: #1d4ed8;
+  --blue-tint: #eff6ff;
+  --slate-tint: #f1f5f9;
 
   /* Typography */
-  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'Inter Variable', 'Inter', system-ui, sans-serif;
 
   --text-xs: 0.75rem; /* 12 */
   --text-sm: 0.8125rem; /* 13 */
@@ -62,18 +63,19 @@
   --s-14: 56px;
   --s-18: 72px;
 
-  --radius-sm: 6px;
-  --radius: 10px;
+  --radius-sm: 8px;
+  --radius: 12px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(23, 26, 24, 0.06);
-  --shadow-md: 0 6px 20px rgba(23, 26, 24, 0.1);
-  --shadow-lg: 0 18px 48px rgba(23, 26, 24, 0.2);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.18);
 
-  --focus: 0 0 0 2px var(--surface), 0 0 0 4px var(--green-mid);
-  --header-h: 60px;
+  --focus: 0 0 0 2px #ffffff, 0 0 0 4px #2563eb;
+  --header-h: 64px;
   --tabbar-h: 60px;
-  --container: 1160px;
+  --container: 1200px;
 }
 
 *,
@@ -121,7 +123,8 @@ h2,
 h3,
 h4 {
   line-height: 1.25;
-  font-weight: 600;
+  font-weight: 650;
+  color: var(--ink);
   text-wrap: balance;
 }
 
@@ -162,7 +165,7 @@ svg {
 }
 
 ::selection {
-  background: var(--green-tint-2);
+  background: var(--brand-tint-2);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -240,36 +243,37 @@ svg {
 }
 
 .eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .display {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .link {
-  color: var(--green);
+  color: var(--brand);
   font-weight: 500;
   text-decoration: underline;
-  text-decoration-color: var(--green-tint-2);
+  text-decoration-color: var(--brand-tint-2);
   text-underline-offset: 3px;
 }
 
 .link:hover {
-  text-decoration-color: var(--green);
+  text-decoration-color: var(--brand);
 }
 
 .link-arrow {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--green);
+  color: var(--brand);
   font-weight: 500;
   font-size: var(--text-sm);
 }
@@ -311,12 +315,13 @@ svg {
 }
 
 .btn-primary {
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover {
-  background: var(--green-dark);
+  background: var(--brand-dark);
 }
 
 .btn-secondary {
@@ -369,9 +374,9 @@ svg {
 }
 
 .btn.is-active {
-  background: var(--green-tint);
-  border-color: var(--green-mid);
-  color: var(--green-dark);
+  background: var(--brand-tint);
+  border-color: var(--brand-mid);
+  color: var(--brand-dark);
 }
 
 .icon-btn {
@@ -390,7 +395,7 @@ svg {
 }
 
 .icon-btn.is-on {
-  color: var(--green);
+  color: var(--brand);
 }
 
 .spinner {
@@ -476,8 +481,8 @@ svg {
 .input:focus-visible,
 .select:focus-visible,
 .textarea:focus-visible {
-  border-color: var(--green-mid);
-  box-shadow: 0 0 0 3px var(--green-tint-2);
+  border-color: var(--brand-mid);
+  box-shadow: 0 0 0 3px var(--brand-tint-2);
 }
 
 .input[aria-invalid='true'],
@@ -488,7 +493,7 @@ svg {
 
 .input::placeholder,
 .textarea::placeholder {
-  color: #8a8e86;
+  color: #94a3b8;
 }
 
 .form-grid {
@@ -518,7 +523,7 @@ svg {
   width: 18px;
   height: 18px;
   margin: 3px 0 0;
-  accent-color: var(--green);
+  accent-color: var(--brand);
   flex-shrink: 0;
 }
 
@@ -564,9 +569,9 @@ legend {
 
 .chip[aria-pressed='true'],
 .chip.is-on {
-  background: var(--green);
-  border-color: var(--green);
-  color: #fff;
+  background: var(--brand-tint);
+  border-color: var(--brand);
+  color: var(--brand-dark);
 }
 
 .chip:focus-visible {
@@ -589,9 +594,14 @@ legend {
   white-space: nowrap;
 }
 
-.tag-green {
-  background: var(--green-tint);
-  color: var(--green-dark);
+.tag-brand {
+  background: var(--brand-tint);
+  color: var(--brand-dark);
+}
+
+.tag-dark {
+  background: var(--ink);
+  color: #fff;
 }
 
 .tag-clay {
@@ -637,7 +647,7 @@ legend {
 }
 
 .badge-verified {
-  color: var(--green);
+  color: var(--brand);
 }
 
 .badge-pending {
@@ -689,9 +699,15 @@ button.badge {
   color: var(--amber);
 }
 
-.pill-green {
-  background: var(--green-tint);
-  color: var(--green-dark);
+.pill-draft {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--muted);
+}
+
+.pill-brand {
+  background: var(--brand-tint);
+  color: var(--brand-dark);
 }
 
 .pill-red {
@@ -705,6 +721,7 @@ button.badge {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
 }
 
 .card-pad {
@@ -754,7 +771,7 @@ button.badge {
 
 .notice-info {
   background: var(--blue-tint);
-  color: #173a57;
+  color: #1e3a8a;
 }
 
 .notice-warn {
@@ -768,8 +785,8 @@ button.badge {
 }
 
 .notice-success {
-  background: var(--green-tint);
-  color: var(--green-dark);
+  background: var(--brand-tint);
+  color: var(--brand-dark);
 }
 
 /* Definition rows: label left, value right */
@@ -813,7 +830,7 @@ button.badge {
 .checklist svg {
   flex-shrink: 0;
   margin-top: 3px;
-  color: var(--green-mid);
+  color: var(--brand-mid);
 }
 
 .checklist .is-off svg {
@@ -845,7 +862,7 @@ button.badge {
   height: 48px;
   border-radius: 50%;
   background: var(--paper-2);
-  color: var(--green);
+  color: var(--brand);
 }
 
 .empty h3 {
@@ -889,7 +906,7 @@ button.badge {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(15, 20, 17, 0.5);
+  background: rgba(15, 23, 42, 0.5);
   animation: fade 0.15s ease;
 }
 
@@ -999,16 +1016,16 @@ button.badge {
 
 .toast svg {
   flex-shrink: 0;
-  color: #8fd3b2;
+  color: #93c5fd;
 }
 
 .toast.is-error svg {
-  color: #f2a797;
+  color: #fca5a5;
 }
 
 .toast a,
 .toast button {
-  color: #b9e5cf;
+  color: #bfdbfe;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -1102,8 +1119,8 @@ button.badge {
 
 .tab[aria-selected='true'],
 .tab.is-on {
-  color: var(--green-dark);
-  border-bottom-color: var(--green);
+  color: var(--brand-dark);
+  border-bottom-color: var(--brand);
 }
 
 .count {
@@ -1168,7 +1185,7 @@ button.badge {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--green-mid);
+  background: var(--brand-mid);
 }
 
 /* ---------- Monogram (company avatar generated from name) ---------- */
@@ -1185,6 +1202,20 @@ button.badge {
   color: #fff;
   flex-shrink: 0;
   user-select: none;
+}
+
+.clogo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.clogo-accent {
+  position: absolute;
+  border-radius: 50%;
 }
 
 .monogram.lg {

@@ -432,23 +432,6 @@ export function DemoTag() {
   );
 }
 
-export function Monogram({ name, hue, size }: { name: string; hue: number; size?: 'sm' | 'lg' }) {
-  const letters = name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-  return (
-    <span
-      className={`monogram${size ? ` ${size}` : ''}`}
-      style={{ background: `hsl(${hue} 32% 30%)` }}
-      aria-hidden="true"
-    >
-      {letters}
-    </span>
-  );
-}
 
 export function PageHead({
   eyebrow,

@@ -6,6 +6,7 @@ import { profileCompleteness } from '../../domain/matching';
 import type { ExperienceLevel, FieldId, MajorId, Student } from '../../domain/types';
 import { isEmail, isUrl } from '../../domain/validate';
 import { Button, ChipGroup, Field, PageHead, useToast } from '../../components/ui';
+import { ResumeManager } from '../../components/resume';
 import { demoLatency, updateStudent } from '../../data/actions';
 import { useSession } from '../../data/selectors';
 import { useT } from '../../i18n';
@@ -24,7 +25,10 @@ export default function Profile() {
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
 
-  const dirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(student), [form, student]);
+  const dirty = useMemo(
+    () => JSON.stringify({ ...form, resume: null, updatedAt: '' }) !== JSON.stringify({ ...student, resume: null, updatedAt: '' }),
+    [form, student],
+  );
   if (!student || !form) return null;
 
   const completeness = profileCompleteness(form);
@@ -43,7 +47,9 @@ export default function Profile() {
     }
     setBusy(true);
     await demoLatency();
-    updateStudent(student.id, { ...form, name: form.name.trim(), email: form.email.trim() });
+    const { resume: _resume, ...rest } = form;
+    void _resume;
+    updateStudent(student.id, { ...rest, name: form.name.trim(), email: form.email.trim(), faculty: form.faculty.trim() });
     setBusy(false);
     if (welcome) {
       toast(p.saved);
@@ -108,6 +114,11 @@ export default function Profile() {
                 )}
               </Field>
             </div>
+            <div className="span-2">
+              <Field label={p.faculty} optional>
+                {(a) => <input {...a} className="input" placeholder={p.facultyPlaceholder} value={form.faculty} onChange={(e) => patch({ faculty: e.target.value })} />}
+              </Field>
+            </div>
             <Field label={p.major}>
               {(a) => (
                 <select {...a} className="select" value={form.major ?? ''} onChange={(e) => patch({ major: (e.target.value || null) as MajorId | null })}>
@@ -133,6 +144,13 @@ export default function Profile() {
               )}
             </Field>
           </div>
+        </section>
+
+        <section className="card card-pad form-section" id="resume">
+          <div>
+            <h2 className="card-title">{p.sections.resume}</h2>
+          </div>
+          <ResumeManager student={student} />
         </section>
 
         <section className="card card-pad form-section">

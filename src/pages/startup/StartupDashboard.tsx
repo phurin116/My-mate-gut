@@ -23,7 +23,7 @@ export function StartupDashboard() {
   const listings = db.listings
     .filter((l) => l.startupId === startup.id)
     .sort((a, b) => b.postedAt.localeCompare(a.postedAt));
-  const applications = db.applications.filter((a) => a.startupId === startup.id);
+  const applications = db.applications.filter((a) => a.startupId === startup.id && a.status !== 'draft');
   const stats = [
     { label: s.stats.open, value: listings.filter((l) => l.status === 'open').length },
     { label: s.stats.applicants, value: applications.length },

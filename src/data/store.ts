@@ -40,6 +40,7 @@ function writeJSON(key: string, value: unknown) {
 function load(): StoreState {
   const stored = readJSON<Database>(DB_KEY);
   const db = stored && stored.schemaVersion === SCHEMA_VERSION ? stored : createSeed();
+  db.recentCompanies ??= {};
   if (db !== stored) writeJSON(DB_KEY, db);
   const session = readJSON<{ userId: ID | null }>(SESSION_KEY);
   const sessionUserId = session?.userId && db.users.some((u) => u.id === session.userId) ? session.userId : null;

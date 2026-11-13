@@ -6,7 +6,8 @@ import type { Listing } from '../domain/types';
 import { DeadlineTag, stipendText } from '../components/listing';
 import { MatchRing } from '../components/match';
 import { TrustBadge } from '../components/trust';
-import { Button, ButtonLink, EmptyState, Monogram, PageHead } from '../components/ui';
+import { Button, ButtonLink, EmptyState, PageHead } from '../components/ui';
+import { CompanyLogo } from '../components/CompanyLogo';
 import { clearCompare, toggleCompare } from '../data/actions';
 import { applicationFor, isOpen, listingStatus, matchFor, startupOf, useSession } from '../data/selectors';
 import { useT } from '../i18n';
@@ -61,7 +62,7 @@ export default function Compare() {
       c.rows.experience,
       (l) =>
         l.noExperienceRequired ? (
-          <span className="tag tag-green">{t.listing.noExperience}</span>
+          <span className="tag tag-brand">{t.listing.noExperience}</span>
         ) : (
           <span className="tag tag-outline">{t.listing.experienceNeeded}</span>
         ),
@@ -72,7 +73,7 @@ export default function Compare() {
       (l) => (
         <span className="row-wrap" style={{ gap: 4 }}>
           {l.skills.map((s) => (
-            <span key={s} className={`tag${student?.skills.includes(s) ? ' tag-green' : ''}`}>
+            <span key={s} className={`tag${student?.skills.includes(s) ? ' tag-brand' : ''}`}>
               {t.skills[s as SkillId] ?? s}
             </span>
           ))}
@@ -104,7 +105,7 @@ export default function Compare() {
                   <th key={l.id} scope="col">
                     <div className="compare-head">
                       <div className="spread">
-                        <Monogram name={s?.name ?? '?'} hue={s?.hue ?? 0} size="sm" />
+                        {s && <CompanyLogo company={s} size={32} />}
                         <button
                           type="button"
                           className="icon-btn"

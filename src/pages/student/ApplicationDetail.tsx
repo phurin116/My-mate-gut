@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { Link, Navigate, useParams, useSearchParams } from 'react-router';
 import { ArrowLeft, BadgeCheck, CalendarClock, CircleCheck, FileText, MessageSquare, Star } from 'lucide-react';
 import { formatDate, formatDateTime } from '../../domain/dates';
 import type { Application } from '../../domain/types';
 import { Timeline } from '../../components/application';
 import { InternshipRow } from '../../components/listing';
+import { ResumeFile } from '../../components/resume';
 import { Stars } from '../../components/reviews';
 import { StatusPill, TrustBadge } from '../../components/trust';
-import { Button, ButtonLink, ConfirmDialog, EmptyState, Field, Monogram, useToast } from '../../components/ui';
+import { Button, ButtonLink, ConfirmDialog, EmptyState, Field, useToast } from '../../components/ui';
+import { CompanyLogo } from '../../components/CompanyLogo';
 import { demoLatency, studentSetStatus, submitReview } from '../../data/actions';
 import { applicationFor, isOpen, listingStatus, useSession } from '../../data/selectors';
 import { useT } from '../../i18n';
@@ -106,6 +108,7 @@ export default function ApplicationDetail() {
     );
   }
 
+  if (application.status === 'draft') return <Navigate to={`/internships/${application.listingId}/apply`} replace />;
   const status = application.status;
   const canWithdraw = ['submitted', 'in_review', 'interview', 'offer'].includes(status);
   const latestMessage = [...application.events].reverse().find((e) => e.actor === 'startup' && e.message);
@@ -141,7 +144,7 @@ export default function ApplicationDetail() {
       )}
 
       <header className="detail-head">
-        <Monogram name={startup.name} hue={startup.hue} size="lg" />
+        <CompanyLogo company={startup} size={64} />
         <div className="grow">
           <h1>{listing.title}</h1>
           <p className="detail-company">
@@ -153,6 +156,7 @@ export default function ApplicationDetail() {
           <div className="row-wrap" style={{ marginTop: 10 }}>
             <StatusPill status={status} />
             <TrustBadge status={listingStatus(db, listing)} kind="listing" />
+            <span className="tag tag-demo">{a.demoTag}</span>
           </div>
         </div>
       </header>
@@ -207,7 +211,7 @@ export default function ApplicationDetail() {
 
           <section className="card card-pad">
             <h2 className="card-title row">
-              <MessageSquare size={18} aria-hidden="true" style={{ color: 'var(--green)' }} />
+              <MessageSquare size={18} aria-hidden="true" style={{ color: 'var(--brand)' }} />
               {a.responseTitle}
             </h2>
             {latestMessage ? (
@@ -228,7 +232,7 @@ export default function ApplicationDetail() {
             (review ? (
               <section className="card card-pad">
                 <h2 className="card-title row">
-                  <BadgeCheck size={18} aria-hidden="true" style={{ color: 'var(--green)' }} />
+                  <BadgeCheck size={18} aria-hidden="true" style={{ color: 'var(--brand)' }} />
                   {a.reviewPublished}
                 </h2>
                 <div style={{ marginTop: 8 }}>
@@ -250,6 +254,10 @@ export default function ApplicationDetail() {
               <div>
                 <dt>{a.availableFrom}</dt>
                 <dd>{application.availableFrom}</dd>
+              </div>
+              <div>
+                <dt>{a.resumeAttached}</dt>
+                <dd>{application.resume ? <ResumeFile file={application.resume} /> : <span className="muted">{a.noResume}</span>}</dd>
               </div>
               {application.portfolioUrl && (
                 <div>

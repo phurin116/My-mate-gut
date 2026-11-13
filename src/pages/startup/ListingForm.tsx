@@ -31,6 +31,7 @@ export default function ListingForm() {
     responsibilities: existing?.responsibilities.join('\n') ?? '',
     learning: existing?.learning.join('\n') ?? '',
     requirements: existing?.requirements.join('\n') ?? '',
+    benefits: existing?.benefits.join('\n') ?? startup?.benefits.join('\n') ?? '',
     skills: (existing?.skills ?? []) as SkillId[],
     noExperienceRequired: existing?.noExperienceRequired ?? true,
     minYear: existing?.minYear ?? 1,
@@ -63,7 +64,7 @@ export default function ListingForm() {
   }
 
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm({ ...form, [key]: value });
-  const text = (key: 'title' | 'summary' | 'responsibilities' | 'learning' | 'requirements' | 'district' | 'stipend' | 'hoursPerWeek' | 'deadline' | 'startDate' | 'supervisorName' | 'supervisorRole') =>
+  const text = (key: 'title' | 'summary' | 'responsibilities' | 'learning' | 'requirements' | 'benefits' | 'district' | 'stipend' | 'hoursPerWeek' | 'deadline' | 'startDate' | 'supervisorName' | 'supervisorRole') =>
     (e: { target: { value: string } }) => set(key, e.target.value);
 
   const submit = async (e: FormEvent) => {
@@ -113,6 +114,7 @@ export default function ListingForm() {
         district: form.district.trim() || startup.district,
         paid: form.paid,
         stipendMonthly: form.paid ? stipend : null,
+        benefits: lines(form.benefits),
         durationMonths: form.durationMonths,
         hoursPerWeek: hours,
         startDate: startDate.toISOString(),
@@ -274,6 +276,11 @@ export default function ListingForm() {
             <Field label={f.startDate} error={errors.startDate}>
               {(p) => <input {...p} className="input" type="date" value={form.startDate} onChange={text('startDate')} />}
             </Field>
+            <div className="span-2">
+              <Field label={f.benefits} help={f.benefitsHelp} optional>
+                {(p) => <textarea {...p} className="textarea" style={{ minHeight: 84 }} value={form.benefits} onChange={text('benefits')} />}
+              </Field>
+            </div>
           </div>
         </section>
 

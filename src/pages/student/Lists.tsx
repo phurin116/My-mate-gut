@@ -53,21 +53,25 @@ export function Applications() {
   const [params, setParams] = useSearchParams();
   const { db, student } = useSession();
   if (!student) return null;
-  const tab = params.get('tab') === 'past' ? 'past' : 'active';
+  const tabParam = params.get('tab');
+  const tab = tabParam === 'past' || tabParam === 'drafts' ? tabParam : 'active';
   const all = db.applications
     .filter((x) => x.studentId === student.id)
     .sort((x, y) => y.updatedAt.localeCompare(x.updatedAt));
+  const drafts = all.filter((x) => x.status === 'draft');
   const active = all.filter(isActive);
-  const past = all.filter((x) => !isActive(x));
-  const shown = tab === 'active' ? active : past;
+  const past = all.filter((x) => !isActive(x) && x.status !== 'draft');
+  const shown = tab === 'active' ? active : tab === 'drafts' ? drafts : past;
 
   return (
     <div className="container page">
       <PageHead title={a.title} lead={a.lead} />
+      <p className="small muted demo-line">{a.demoNote}</p>
       <div className="tabs" role="tablist" style={{ marginBottom: 16 }}>
         {(
           [
             ['active', a.tabActive, active.length],
+            ['drafts', a.tabDrafts, drafts.length],
             ['past', a.tabPast, past.length],
           ] as const
         ).map(([id, label, n]) => (
@@ -77,7 +81,7 @@ export function Applications() {
             role="tab"
             aria-selected={tab === id}
             className="tab"
-            onClick={() => setParams(id === 'past' ? { tab: 'past' } : {}, { replace: true })}
+            onClick={() => setParams(id === 'active' ? {} : { tab: id }, { replace: true })}
           >
             {label} <span className="count">{n}</span>
           </button>
@@ -86,8 +90,8 @@ export function Applications() {
       {shown.length === 0 ? (
         <EmptyState
           icon={<FileText size={22} />}
-          title={tab === 'active' ? a.emptyActiveTitle : a.emptyPastTitle}
-          body={tab === 'active' ? a.emptyActiveBody : a.emptyPastBody}
+          title={tab === 'active' ? a.emptyActiveTitle : tab === 'drafts' ? a.emptyDraftsTitle : a.emptyPastTitle}
+          body={tab === 'active' ? a.emptyActiveBody : tab === 'drafts' ? a.emptyDraftsBody : a.emptyPastBody}
         >
           {tab === 'active' && (
             <ButtonLink to="/internships" variant="primary">

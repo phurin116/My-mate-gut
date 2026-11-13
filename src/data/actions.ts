@@ -12,6 +12,7 @@ import type {
   Notification,
   ReportReason,
   Startup,
+  StoredFile,
   Student,
   VerificationStatus,
   VerificationSubject,
@@ -59,6 +60,7 @@ export function registerStudent(input: { name: string; email: string; university
       name: input.name,
       email: input.email,
       universityId: input.universityId,
+      faculty: '',
       major: null,
       year: null,
       skills: [],
@@ -69,6 +71,7 @@ export function registerStudent(input: { name: string; email: string; university
       experienceNote: '',
       about: '',
       portfolioUrl: '',
+      resume: null,
       prefs: { workModes: [], paidOnly: false, maxDurationMonths: null },
       updatedAt: nowISO(),
       isDemo: false,
@@ -92,6 +95,28 @@ export interface StartupSignup {
   website: string;
 }
 
+const LOGO_COLORS = ['#0F766E', '#7C3AED', '#B45309', '#BE123C', '#0369A1', '#4338CA', '#15803D', '#C2410C'];
+const LOGO_SHAPES = ['square', 'circle', 'hex', 'pill', 'tab', 'diamond'] as const;
+
+/** An original letter-mark logo for a newly registered company. */
+function newCompanyLogo(name: string) {
+  const seed = [...name].reduce((n, ch) => n + ch.charCodeAt(0), 0);
+  const letters = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  return {
+    shape: LOGO_SHAPES[seed % LOGO_SHAPES.length],
+    bg: LOGO_COLORS[seed % LOGO_COLORS.length],
+    fg: '#FFFFFF',
+    mark: letters || '?',
+    kind: 'letters' as const,
+  };
+}
+
 export function registerStartup(input: StartupSignup): ID {
   const userId = newId('u');
   const startupId = newId('st');
@@ -111,7 +136,17 @@ export function registerStartup(input: StartupSignup): ID {
       website: input.website,
       contactName: input.contactName,
       contactRole: input.contactRole,
-      hue: Math.floor(Math.random() * 360),
+      hue: 0,
+      kind: 'startup',
+      logo: newCompanyLogo(input.companyName),
+      workplace: '',
+      benefits: [],
+      process: [
+        'Apply on My Mate Gut with your profile and resume',
+        'The hiring team reviews your application',
+        'Interview with the team',
+        'Decision and offer',
+      ],
       createdAt: nowISO(),
       isDemo: false,
     });
@@ -191,32 +226,65 @@ export function clearCompare() {
   });
 }
 
-export function applyToListing(
-  studentId: ID,
-  listingId: ID,
-  input: { motivation: string; availableFrom: string; portfolioUrl: string },
-): ID {
-  const id = newId('a');
-  const t = dict();
+export interface ApplicationInput {
+  motivation: string;
+  availableFrom: string;
+  portfolioUrl: string;
+  resume: StoredFile | null;
+}
+
+/** Create or update a draft. Drafts are private to the student and never shown to the company. */
+export function saveDraft(studentId: ID, listingId: ID, input: ApplicationInput): ID {
+  const existing = getState().db.applications.find((a) => a.studentId === studentId && a.listingId === listingId);
+  const id = existing?.id ?? newId('a');
   mutate((db) => {
-    const listing = db.listings.find((l) => l.id === listingId);
-    const student = db.students.find((s) => s.id === studentId);
-    if (!listing || !student) return;
     const at = nowISO();
+    const app = db.applications.find((a) => a.id === id);
+    if (app) {
+      if (app.status !== 'draft') return;
+      Object.assign(app, input, { updatedAt: at });
+      return;
+    }
+    const listing = db.listings.find((l) => l.id === listingId);
+    if (!listing) return;
     db.applications.unshift({
+      ...input,
       id,
       listingId,
       startupId: listing.startupId,
       studentId,
-      status: 'submitted',
-      motivation: input.motivation,
-      availableFrom: input.availableFrom,
-      portfolioUrl: input.portfolioUrl,
+      status: 'draft',
       appliedAt: at,
       updatedAt: at,
-      events: [{ at, status: 'submitted', actor: 'student', message: '' }],
+      events: [],
       interview: null,
     });
+  });
+  return id;
+}
+
+export function deleteDraft(applicationId: ID) {
+  mutate((db) => {
+    db.applications = db.applications.filter((a) => !(a.id === applicationId && a.status === 'draft'));
+  });
+}
+
+/**
+ * Submit an application (turning an existing draft into a submission).
+ * In demo mode this only records the submission in this browser and notifies
+ * the company's account here. Nothing is sent to any real organisation.
+ */
+export function applyToListing(studentId: ID, listingId: ID, input: ApplicationInput): ID {
+  const draftId = saveDraft(studentId, listingId, input);
+  const t = dict();
+  mutate((db) => {
+    const app = db.applications.find((a) => a.id === draftId);
+    const listing = db.listings.find((l) => l.id === listingId);
+    const student = db.students.find((s) => s.id === studentId);
+    if (!app || !listing || !student || app.status !== 'draft') return;
+    const at = nowISO();
+    Object.assign(app, input, { status: 'submitted', appliedAt: at, updatedAt: at });
+    app.events = [{ at, status: 'submitted', actor: 'student', message: '' }];
     notify(db, startupUsers(db, listing.startupId), {
       kind: 'application',
       title: t.notify.newApplication(listing.title),
@@ -224,7 +292,30 @@ export function applyToListing(
       link: `/startup/listings/${listing.id}/applicants`,
     });
   });
-  return id;
+  return draftId;
+}
+
+/** Set or clear the student's current resume. Old files are deleted only if no application still uses them. */
+export function setResume(studentId: ID, resume: StoredFile | null): StoredFile | null {
+  let previous: StoredFile | null = null;
+  mutate((db) => {
+    const s = db.students.find((x) => x.id === studentId);
+    if (!s) return;
+    previous = s.resume;
+    s.resume = resume;
+    s.updatedAt = nowISO();
+  });
+  const old = previous as StoredFile | null;
+  if (old && !getState().db.applications.some((a) => a.resume?.id === old.id && a.status !== 'draft')) return old;
+  return null;
+}
+
+export function recordCompanyView(viewerKey: string, companyId: ID) {
+  const current = getState().db.recentCompanies[viewerKey] ?? [];
+  if (current[0] === companyId) return;
+  mutate((db) => {
+    db.recentCompanies[viewerKey] = [companyId, ...current.filter((id) => id !== companyId)].slice(0, MAX_RECENT);
+  });
 }
 
 function pushStatus(

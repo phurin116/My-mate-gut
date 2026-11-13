@@ -84,12 +84,13 @@ export function VerificationPanel({
 }
 
 const STATUS_TONE: Record<ApplicationStatus, string> = {
+  draft: 'draft',
   submitted: 'neutral',
   in_review: 'blue',
   interview: 'amber',
-  offer: 'green',
-  accepted: 'green',
-  completed: 'green',
+  offer: 'brand',
+  accepted: 'brand',
+  completed: 'brand',
   declined: 'neutral',
   rejected: 'red',
   withdrawn: 'neutral',

@@ -140,6 +140,7 @@ export function isRecommended(match: MatchResult): boolean {
 export function profileCompleteness(student: Student): { done: number; total: number; missing: string[] } {
   const checks: [string, boolean][] = [
     ['university', !!student.universityId],
+    ['faculty', !!student.faculty.trim()],
     ['major', !!student.major],
     ['year', !!student.year],
     ['skills', student.skills.length > 0],
@@ -148,6 +149,7 @@ export function profileCompleteness(student: Student): { done: number; total: nu
     ['experience', !!student.experience],
     ['industries', student.industries.length > 0],
     ['workModes', student.prefs.workModes.length > 0],
+    ['resume', !!student.resume],
   ];
   return {
     done: checks.filter(([, ok]) => ok).length,

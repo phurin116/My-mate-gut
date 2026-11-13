@@ -10,14 +10,25 @@ export type Role = 'student' | 'startup' | 'university' | 'admin';
 
 export type FieldId =
   | 'marketing'
-  | 'product'
-  | 'engineering'
-  | 'design'
-  | 'data'
-  | 'finance'
   | 'bizdev'
+  | 'finance'
+  | 'accounting'
+  | 'consulting'
+  | 'hr'
+  | 'digital_marketing'
+  | 'social_media'
+  | 'content'
+  | 'graphic_design'
+  | 'ux_design'
+  | 'engineering'
+  | 'data'
+  | 'product'
+  | 'ecommerce'
   | 'operations'
-  | 'content';
+  | 'pr'
+  | 'events'
+  | 'sales'
+  | 'supply_chain';
 
 export type IndustryId =
   | 'fintech'
@@ -30,7 +41,20 @@ export type IndustryId =
   | 'saas'
   | 'media'
   | 'logistics'
-  | 'proptech';
+  | 'proptech'
+  | 'retail'
+  | 'consulting'
+  | 'hospitality'
+  | 'fmcg'
+  | 'agency'
+  | 'telecom'
+  | 'hrtech'
+  | 'mobility'
+  | 'financial_services'
+  | 'design_studio'
+  | 'events'
+  | 'analytics'
+  | 'accounting';
 
 export type MajorId =
   | 'business'
@@ -76,12 +100,22 @@ export interface StudentPrefs {
   maxDurationMonths: number | null;
 }
 
+/** Metadata for a file kept in the browser file store (data/files.ts). */
+export interface StoredFile {
+  id: ID;
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: ISODate;
+}
+
 export interface Student {
   id: ID;
   userId: ID;
   name: string;
   email: string;
   universityId: ID | null;
+  faculty: string;
   major: MajorId | null;
   year: number | null;
   skills: string[];
@@ -92,14 +126,35 @@ export interface Student {
   experienceNote: string;
   about: string;
   portfolioUrl: string;
+  resume: StoredFile | null;
   prefs: StudentPrefs;
   updatedAt: ISODate;
   isDemo: boolean;
 }
 
+export type CompanyKind = 'startup' | 'growing' | 'established';
+
+/** Description of an original, generated company logo. Demo companies never use real brand marks. */
+export interface LogoSpec {
+  shape: 'square' | 'circle' | 'hex' | 'pill' | 'diamond' | 'tab';
+  bg: string;
+  fg: string;
+  /** Letters to show, or an icon key from components/CompanyLogo. */
+  mark: string;
+  kind: 'letters' | 'icon';
+  font?: 'sans' | 'serif' | 'mono';
+  accent?: string;
+}
+
 export interface Startup {
   id: ID;
   name: string;
+  kind: CompanyKind;
+  logo: LogoSpec;
+  workplace: string;
+  benefits: string[];
+  /** Steps of the company's hiring process, in order. */
+  process: string[];
   tagline: string;
   about: string;
   industry: IndustryId;
@@ -133,8 +188,10 @@ export interface Listing {
   minYear: number;
   workMode: WorkMode;
   district: string;
+  /** paid with stipendMonthly null means "allowance not stated". */
   paid: boolean;
   stipendMonthly: number | null;
+  benefits: string[];
   durationMonths: number;
   hoursPerWeek: number;
   startDate: ISODate;
@@ -168,6 +225,7 @@ export interface VerificationRecord {
 }
 
 export type ApplicationStatus =
+  | 'draft'
   | 'submitted'
   | 'in_review'
   | 'interview'
@@ -203,6 +261,8 @@ export interface Application {
   motivation: string;
   availableFrom: string;
   portfolioUrl: string;
+  /** Resume attached when the application was submitted. Kept even if the student replaces theirs later. */
+  resume: StoredFile | null;
   appliedAt: ISODate;
   updatedAt: ISODate;
   events: ApplicationEvent[];
@@ -269,6 +329,8 @@ export interface Database {
   reports: Report[];
   /** Listing ids recently opened, newest first, keyed by user id or "guest". */
   recentlyViewed: Record<string, ID[]>;
+  /** Company ids recently opened, newest first, keyed like recentlyViewed. */
+  recentCompanies: Record<string, ID[]>;
   /** Listing ids currently selected for comparison. */
   compare: ID[];
 }

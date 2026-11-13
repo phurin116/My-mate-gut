@@ -6,6 +6,7 @@ import { daysFromNow, formatDate, toLocalInput } from '../../domain/dates';
 import { matchListing } from '../../domain/matching';
 import type { Application, InterviewInfo } from '../../domain/types';
 import { Timeline } from '../../components/application';
+import { ResumeFile } from '../../components/resume';
 import { MatchRing } from '../../components/match';
 import { StatusPill } from '../../components/trust';
 import { Button, ButtonLink, Dialog, EmptyState, Field, PageHead, Tooltip, useToast } from '../../components/ui';
@@ -172,7 +173,7 @@ export default function Applicants() {
   }
 
   const all = db.applications
-    .filter((x) => x.listingId === listing.id)
+    .filter((x) => x.listingId === listing.id && x.status !== 'draft')
     .sort((x, y) => y.appliedAt.localeCompare(x.appliedAt));
   const groups = {
     all,
@@ -254,7 +255,7 @@ export default function Applicants() {
                       {student.skills
                         .filter((s) => listing.skills.includes(s))
                         .map((s) => (
-                          <span key={s} className="tag tag-green">
+                          <span key={s} className="tag tag-brand">
                             {t.skills[s as SkillId] ?? s}
                           </span>
                         ))}
@@ -288,6 +289,10 @@ export default function Applicants() {
                           <div>
                             <dt>{a.availability}</dt>
                             <dd>{app.availableFrom}</dd>
+                          </div>
+                          <div>
+                            <dt>{a.resume}</dt>
+                            <dd>{app.resume ? <ResumeFile file={app.resume} /> : '–'}</dd>
                           </div>
                           {(app.portfolioUrl || student.portfolioUrl) && (
                             <div>

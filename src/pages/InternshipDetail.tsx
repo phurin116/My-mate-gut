@@ -13,6 +13,8 @@ import {
   ShieldAlert,
   ShieldQuestion,
   UserRound,
+  Gift,
+  Info,
 } from 'lucide-react';
 import type { SkillId } from '../domain/catalog';
 import { formatDate } from '../domain/dates';
@@ -20,7 +22,8 @@ import { DeadlineTag, InternshipRow, stipendText, useCompareToggle, useSaveToggl
 import { MatchBreakdown, MatchRing, reasonSentence } from '../components/match';
 import { ReviewList } from '../components/reviews';
 import { ReportButton, StatusPill, TrustBadge, VerificationPanel } from '../components/trust';
-import { Button, ButtonLink, DemoTag, EmptyState, Monogram, useToast } from '../components/ui';
+import { Button, ButtonLink, DemoTag, EmptyState, useToast } from '../components/ui';
+import { CompanyLogo } from '../components/CompanyLogo';
 import { recordView } from '../data/actions';
 import {
   applicationFor,
@@ -78,6 +81,13 @@ export default function InternshipDetail() {
   const canSave = !user || user.role === 'student';
 
   const applyAction = () => {
+    if (application?.status === 'draft' && open) {
+      return (
+        <ButtonLink to={`/internships/${listing.id}/apply`} variant="primary" block size="lg">
+          {d.continueDraft}
+        </ButtonLink>
+      );
+    }
     if (application) {
       return (
         <ButtonLink to={`/applications/${application.id}`} variant="secondary" block>
@@ -129,7 +139,7 @@ export default function InternshipDetail() {
       <div className="detail-layout">
         <div className="detail-main">
           <header className="detail-head">
-            <Monogram name={startup?.name ?? '?'} hue={startup?.hue ?? 0} size="lg" />
+            {startup && <CompanyLogo company={startup} size={64} />}
             <div className="grow">
               <h1>{listing.title}</h1>
               <p className="detail-company">
@@ -142,11 +152,18 @@ export default function InternshipDetail() {
                 <TrustBadge status={status} kind="listing" />
                 {listing.isDemo && <DemoTag />}
                 <span className="tag">{t.fields[listing.field]}</span>
-                {listing.noExperienceRequired && <span className="tag tag-green">{t.listing.noExperience}</span>}
+                {listing.noExperienceRequired && <span className="tag tag-brand">{t.listing.noExperience}</span>}
                 {application && <StatusPill status={application.status} />}
               </div>
             </div>
           </header>
+
+          {listing.isDemo && (
+            <div className="notice notice-info" role="note">
+              <Info size={18} aria-hidden="true" />
+              <p>{d.demoNotice}</p>
+            </div>
+          )}
 
           {status === 'unverified' && (
             <div className="notice notice-danger" role="note">
@@ -195,6 +212,20 @@ export default function InternshipDetail() {
             </section>
           )}
 
+          {listing.benefits.length > 0 && (
+            <section className="detail-section">
+              <h2>{d.benefits}</h2>
+              <ul className="benefit-list">
+                {listing.benefits.map((item) => (
+                  <li key={item}>
+                    <Gift size={16} aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <section className="detail-section">
             <h2>{d.requirements}</h2>
             <ul className="bullets">
@@ -211,7 +242,7 @@ export default function InternshipDetail() {
               {listing.skills.map((s) => {
                 const have = student?.skills.includes(s);
                 return (
-                  <span key={s} className={`tag${have ? ' tag-green' : ''}`}>
+                  <span key={s} className={`tag${have ? ' tag-brand' : ''}`}>
                     {have && <Check size={12} aria-hidden="true" />}
                     {t.skills[s as SkillId] ?? s}
                     {have && <span className="sr-only"> ({d.skillsYouHave})</span>}
@@ -267,7 +298,7 @@ export default function InternshipDetail() {
               <DeadlineTag listing={listing} />
             </div>
             <p className="apply-deadline display">{formatDate(listing.deadline)}</p>
-            {application && <p className="small muted">{d.applied(formatDate(application.appliedAt))}</p>}
+            {application && application.status !== 'draft' && <p className="small muted">{d.applied(formatDate(application.appliedAt))}</p>}
             {applyAction()}
             {user && user.role !== 'student' && (
               <p className="small muted">{user.startupId === listing.startupId ? d.ownerNote : d.otherRoleNote}</p>
@@ -384,7 +415,7 @@ export default function InternshipDetail() {
       )}
 
       {/* Mobile: the primary action stays reachable while reading. */}
-      {open && !application && (!user || user.role === 'student') && (
+      {open && (!application || application.status === 'draft') && (!user || user.role === 'student') && (
         <div className="sticky-apply">
           <div className="grow">
             <p className="truncate" style={{ fontWeight: 600 }}>
@@ -394,7 +425,7 @@ export default function InternshipDetail() {
           </div>
           {user ? (
             <ButtonLink to={`/internships/${listing.id}/apply`} variant="primary">
-              {d.applyShort}
+              {application ? d.continueDraftShort : d.applyShort}
             </ButtonLink>
           ) : (
             <ButtonLink to="/signin" variant="primary" state={{ from: `/internships/${listing.id}/apply` }}>

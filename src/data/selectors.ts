@@ -61,6 +61,15 @@ export function applicationFor(db: Database, studentId: ID, listingId: ID): Appl
   return db.applications.find((a) => a.studentId === studentId && a.listingId === listingId);
 }
 
+/** Applications a company can see: everything except private drafts. */
+export function isSubmitted(app: Application): boolean {
+  return app.status !== 'draft';
+}
+
+export function companyOpenListings(db: Database, startupId: ID): Listing[] {
+  return db.listings.filter((l) => l.startupId === startupId && isOpen(l));
+}
+
 export const ACTIVE_STATUSES: Application['status'][] = ['submitted', 'in_review', 'interview', 'offer', 'accepted'];
 
 export function isActive(app: Application): boolean {

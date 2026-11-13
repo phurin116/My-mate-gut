@@ -2,7 +2,23 @@
 
 A platform that connects Bangkok university students with verified, beginner-friendly startup internships.
 
-This is a working prototype that runs in **demo mode**: there is no backend, all data is sample data, and everything is stored in the browser's localStorage. No passwords or credentials are collected.
+This is a working prototype that runs in **demo mode**: there is no backend, and everything is stored in the browser (localStorage for data, IndexedDB for uploaded resumes). No passwords or credentials are collected.
+
+## About the demo data
+
+- 30 companies and 61 internships across 20 categories, mostly beginner-friendly.
+- **Every company is fictional.** Names, logos and descriptions are original and are not modelled on real brands, so nothing can be mistaken for a real vacancy. Each one shows a "Demo" label.
+- No real company openings are included, because none could be verified from an official source while building this version. The data model supports adding verified real listings later.
+- Allowances, deadlines and verification records are demo values.
+- Applications submitted in demo mode are saved in the browser only and are not sent to anyone.
+
+## What needs a real backend before public launch
+
+- Accounts with real authentication (demo mode has no passwords).
+- A shared database, so students and companies on different devices see the same data.
+- Resume storage on a server (currently kept in the browser).
+- Email or LINE notifications when an application status changes.
+- A real verification workflow and moderation of reports.
 
 ## Run it
 

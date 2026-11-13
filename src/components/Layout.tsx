@@ -29,28 +29,29 @@ function useNavItems(): NavItem[] {
   const t = useT();
   const { user } = useSession();
   const browse = { to: '/internships', label: t.nav.internships };
-  const trust = { to: '/trust', label: t.nav.trust };
+  const companies = { to: '/companies', label: t.nav.companies };
   switch (user?.role) {
-    case 'student':
-      return [
-        { to: '/dashboard', label: t.nav.dashboard },
-        browse,
-        { to: '/applications', label: t.nav.applications },
-        { to: '/saved', label: t.nav.saved },
-      ];
     case 'startup':
       return [
         { to: '/startup', label: t.nav.listings, end: true },
         { to: '/startup/company', label: t.nav.companyProfile },
         browse,
-        trust,
+        companies,
       ];
     case 'university':
-      return [{ to: '/university', label: t.nav.report }, browse, trust];
+      return [{ to: '/university', label: t.nav.report }, browse, companies];
     case 'admin':
-      return [{ to: '/admin', label: t.nav.verificationQueue }, browse, trust];
+      return [{ to: '/admin', label: t.nav.verificationQueue }, browse, companies];
     default:
-      return [browse, trust, { to: '/signin?tab=create&as=startup', label: t.nav.forStartups }];
+      // Students and visitors see the same structure. Personal pages ask visitors to sign in.
+      return [
+        { to: '/', label: t.nav.home, end: true },
+        browse,
+        companies,
+        { to: '/saved', label: t.nav.saved },
+        { to: '/applications', label: t.nav.applications },
+        { to: '/dashboard', label: t.nav.dashboard },
+      ];
   }
 }
 
@@ -59,11 +60,11 @@ function Logo() {
   return (
     <Link to="/" className="logo" aria-label={`${t.brand}. ${t.nav.home}`}>
       <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="var(--green)" />
+        <rect width="32" height="32" rx="7" fill="var(--brand)" />
         <path
           d="M8 22V10l8 7 8-7v12"
           fill="none"
-          stroke="#f6f3ec"
+          stroke="#ffffff"
           strokeWidth="2.6"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -223,9 +224,14 @@ function Header() {
               </span>
             </>
           ) : (
-            <ButtonLink to="/signin" variant="primary" size="sm">
-              {t.actions.signIn}
-            </ButtonLink>
+            <>
+              <Link to="/signin?tab=create&as=startup" className="employer-link desktop-only">
+                {t.nav.forEmployers}
+              </Link>
+              <ButtonLink to="/signin" variant="primary" size="sm">
+                {t.actions.signIn}
+              </ButtonLink>
+            </>
           )}
           <button
             type="button"
@@ -272,14 +278,19 @@ function Header() {
                   <NavLink to="/profile" className="drawer-link">
                     {t.nav.profile}
                   </NavLink>
-                  <NavLink to="/trust" className="drawer-link">
-                    {t.nav.trust}
+                  <NavLink to="/notifications" className="drawer-link">
+                    {t.nav.notifications}
                   </NavLink>
                 </>
               )}
               <NavLink to="/compare" className="drawer-link">
                 {t.pub.compare.title}
               </NavLink>
+              {!user && (
+                <NavLink to="/signin?tab=create&as=startup" className="drawer-link">
+                  {t.nav.forEmployers}
+                </NavLink>
+              )}
             </nav>
             <div style={{ padding: 20, marginTop: 'auto' }}>
               {user ? (
@@ -311,10 +322,10 @@ function Header() {
 function StudentTabBar() {
   const t = useT();
   const tabs = [
-    { to: '/dashboard', label: t.nav.home, icon: LayoutDashboard },
+    { to: '/dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
     { to: '/internships', label: t.nav.explore, icon: Compass },
     { to: '/saved', label: t.nav.saved, icon: Bookmark },
-    { to: '/applications', label: t.nav.applications, icon: FileText },
+    { to: '/applications', label: t.nav.applicationsShort, icon: FileText },
     { to: '/profile', label: t.nav.profile, icon: UserIcon },
   ];
   return (
@@ -353,7 +364,10 @@ function Footer() {
               <Link to="/internships">{f.browse}</Link>
             </li>
             <li>
-              <Link to="/internships?beginner=1">{f.noExperience}</Link>
+              <Link to="/internships?exp=none">{f.noExperience}</Link>
+            </li>
+            <li>
+              <Link to="/companies">{f.companies}</Link>
             </li>
             <li>
               <Link to={profileLink}>{f.createProfile}</Link>

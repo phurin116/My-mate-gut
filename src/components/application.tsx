@@ -5,7 +5,7 @@ import type { Application, ApplicationStatus } from '../domain/types';
 import { useSession } from '../data/selectors';
 import { useT } from '../i18n';
 import { StatusPill } from './trust';
-import { Monogram } from './ui';
+import { CompanyLogo } from './CompanyLogo';
 
 /** One application as a link row: role, company, status and last update. */
 export function ApplicationRow({ application, compact }: { application: Application; compact?: boolean }) {
@@ -14,13 +14,16 @@ export function ApplicationRow({ application, compact }: { application: Applicat
   const listing = db.listings.find((l) => l.id === application.listingId);
   const startup = db.startups.find((s) => s.id === application.startupId);
   return (
-    <Link to={`/applications/${application.id}`} className={`app-row${compact ? ' is-compact' : ''}`}>
-      <Monogram name={startup?.name ?? '?'} hue={startup?.hue ?? 0} size={compact ? 'sm' : undefined} />
+    <Link
+      to={application.status === 'draft' ? `/internships/${application.listingId}/apply` : `/applications/${application.id}`}
+      className={`app-row${compact ? ' is-compact' : ''}`}
+    >
+      {startup && <CompanyLogo company={startup} size={compact ? 32 : 44} />}
       <span className="grow">
         <span className="app-row-title truncate">{listing?.title}</span>
         <span className="small muted truncate" style={{ display: 'block' }}>
           {startup?.name}
-          {!compact && ` · ${t.stu.applications.appliedOn(formatDate(application.appliedAt))}`}
+          {!compact && application.status !== 'draft' && ` · ${t.stu.applications.appliedOn(formatDate(application.appliedAt))}`}
         </span>
         {!compact && <span className="app-row-next small">{t.stu.application.next[application.status]}</span>}
       </span>

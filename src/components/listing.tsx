@@ -28,7 +28,8 @@ import {
 import { useT } from '../i18n';
 import { MatchRing, reasonSentence } from './match';
 import { StatusPill, TrustBadge } from './trust';
-import { ButtonLink, DemoTag, Monogram, Skeleton, useToast } from './ui';
+import { ButtonLink, DemoTag, Skeleton, useToast } from './ui';
+import { CompanyLogo } from './CompanyLogo';
 
 export function useSaveToggle() {
   const t = useT();
@@ -85,9 +86,8 @@ export function DeadlineTag({ listing }: { listing: Listing }) {
 }
 
 export function stipendText(t: ReturnType<typeof useT>, listing: Listing): string {
-  return listing.paid && listing.stipendMonthly
-    ? t.listing.stipend(formatBaht(listing.stipendMonthly))
-    : t.listing.stipendUnpaid;
+  if (!listing.paid) return t.listing.stipendUnpaid;
+  return listing.stipendMonthly ? t.listing.stipend(formatBaht(listing.stipendMonthly)) : t.listing.stipendUnknown;
 }
 
 export function InternshipCard({
@@ -117,7 +117,7 @@ export function InternshipCard({
   return (
     <article className="icard">
       <div className="icard-top">
-        <Monogram name={startup?.name ?? '?'} hue={startup?.hue ?? 0} />
+        {startup && <CompanyLogo company={startup} />}
         <div className="grow">
           <h3 className="icard-title">
             <Link to={`/internships/${listing.id}`} state={{ from: location.pathname + location.search }}>
@@ -166,7 +166,7 @@ export function InternshipCard({
       <div className="icard-tags">
         <span className="tag">{t.fields[listing.field]}</span>
         {listing.noExperienceRequired ? (
-          <span className="tag tag-green">{t.listing.noExperience}</span>
+          <span className="tag tag-brand">{t.listing.noExperience}</span>
         ) : (
           <span className="tag tag-outline">{t.listing.experienceNeeded}</span>
         )}
@@ -237,7 +237,7 @@ export function InternshipRow({ listing }: { listing: Listing }) {
       state={{ from: location.pathname + location.search }}
       className="irow"
     >
-      <Monogram name={startup?.name ?? '?'} hue={startup?.hue ?? 0} size="sm" />
+      {startup && <CompanyLogo company={startup} size={32} />}
       <span className="grow">
         <span className="irow-title truncate">{listing.title}</span>
         <span className="small muted truncate" style={{ display: 'block' }}>

@@ -59,7 +59,7 @@ export default function Trust() {
 
       <section className="detail-section">
         <h2 className="row">
-          <BadgeCheck size={20} aria-hidden="true" style={{ color: 'var(--green)' }} />
+          <BadgeCheck size={20} aria-hidden="true" style={{ color: 'var(--brand)' }} />
           {p.reviewsTitle}
         </h2>
         <p>{p.reviewsBody}</p>

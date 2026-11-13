@@ -1,4 +1,6 @@
 import { daysFromNow, nowISO } from '../domain/dates';
+import { COMPANY_EXTRAS, NEW_COMPANIES } from './demo/companies';
+import { expand, NEW_LISTINGS } from './demo/listings';
 import type {
   Application,
   ApplicationEvent,
@@ -25,7 +27,7 @@ import type {
  * Dates are relative to the day the data is first loaded so deadlines stay current.
  */
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export const DEMO_USER_IDS = {
   student: 'u_ploy',
@@ -63,6 +65,7 @@ function startup(
   contactRole: string,
 ): Startup {
   return {
+    ...COMPANY_EXTRAS[id],
     id,
     name,
     industry,
@@ -81,7 +84,7 @@ function startup(
   };
 }
 
-const startups: Startup[] = [
+const originalStartups: Startup[] = [
   startup(
     'st_kradan', 'Kradan Learning', 'edtech', 'Sam Yan', 160,
     'Exam prep that fits in a phone for Thai high-school students.',
@@ -156,6 +159,8 @@ const startups: Startup[] = [
   ),
 ];
 
+const startups: Startup[] = [...originalStartups, ...NEW_COMPANIES];
+
 interface ListingInput {
   id: string;
   startupId: string;
@@ -196,6 +201,7 @@ function listing(i: ListingInput): Listing {
     district: s.district,
     paid: i.stipend !== null,
     stipendMonthly: i.stipend,
+    benefits: s.benefits.slice(0, 4),
     durationMonths: i.months,
     hoursPerWeek: i.hours,
     startDate: daysFromNow(i.deadlineIn + 21),
@@ -210,7 +216,7 @@ function listing(i: ListingInput): Listing {
   };
 }
 
-const listings: Listing[] = [
+const originalListings: Listing[] = [
   listing({
     id: 'l_kradan_mkt', startupId: 'st_kradan', title: 'Marketing & Community Intern', field: 'marketing',
     summary: 'Help grow the student community around the Kradan study app, from planning weekly content to talking with users in LINE groups.',
@@ -331,7 +337,7 @@ const listings: Listing[] = [
     supervisor: ['Pim T.', 'Head of Content'],
   }),
   listing({
-    id: 'l_frame_growth', startupId: 'st_framehaus', title: 'Growth Marketing Intern', field: 'marketing',
+    id: 'l_frame_growth', startupId: 'st_framehaus', title: 'Growth Marketing Intern', field: 'digital_marketing',
     summary: 'Test new ways to reach creator teams, from partnership outreach to landing page experiments.',
     responsibilities: [
       'Build a list of 100 creator teams and run outreach',
@@ -419,7 +425,7 @@ const listings: Listing[] = [
     supervisor: ['Dr. Warisa L.', 'Co-founder, Product'],
   }),
   listing({
-    id: 'l_klinik_ux', startupId: 'st_klinikloop', title: 'UX Design Intern', field: 'design',
+    id: 'l_klinik_ux', startupId: 'st_klinikloop', title: 'UX Design Intern', field: 'ux_design',
     summary: 'Design and test improvements to the patient reminder flow with the lead designer.',
     responsibilities: [
       'Produce wireframes and clickable prototypes in Figma',
@@ -461,7 +467,7 @@ const listings: Listing[] = [
     supervisor: ['Thanakorn J.', 'Co-founder, Growth'],
   }),
   listing({
-    id: 'l_baanly_design', startupId: 'st_baanly', title: 'Product Design Intern', field: 'design',
+    id: 'l_baanly_design', startupId: 'st_baanly', title: 'Product Design Intern', field: 'ux_design',
     summary: 'Improve the room listing page and search filters used by students looking for housing.',
     responsibilities: [
       'Audit the current listing page and propose changes',
@@ -476,7 +482,7 @@ const listings: Listing[] = [
     supervisor: ['Mook R.', 'Design Lead'],
   }),
   listing({
-    id: 'l_baanly_community', startupId: 'st_baanly', title: 'Campus Community Intern', field: 'marketing',
+    id: 'l_baanly_community', startupId: 'st_baanly', title: 'Campus Community Intern', field: 'social_media',
     summary: 'Represent Baanly on your campus, collect student housing questions and help plan two campus events.',
     responsibilities: [
       'Answer housing questions in student groups',
@@ -505,7 +511,7 @@ const listings: Listing[] = [
     supervisor: ['Jirayu B.', 'Founder'],
   }),
   listing({
-    id: 'l_mint_mkt', startupId: 'st_mintpot', title: 'Social Media Intern', field: 'marketing',
+    id: 'l_mint_mkt', startupId: 'st_mintpot', title: 'Social Media Intern', field: 'social_media',
     summary: 'Create posts and reply to customer messages for an online plant shop.',
     responsibilities: ['Create daily posts', 'Reply to customer messages', 'Help pack orders when needed'],
     learning: ['Running a small shop social account'],
@@ -514,7 +520,7 @@ const listings: Listing[] = [
     noExp: true, minYear: 1, mode: 'remote', stipend: null, months: 2, hours: 15, deadlineIn: 18, postedAgo: 12,
   }),
   listing({
-    id: 'l_orbit_bd', startupId: 'st_orbit', title: 'Sales Intern', field: 'bizdev',
+    id: 'l_orbit_bd', startupId: 'st_orbit', title: 'Sales Intern', field: 'sales',
     summary: 'Contact parents and schedule trial lessons for an online tutoring service.',
     responsibilities: ['Call parents from a contact list', 'Schedule trial lessons'],
     learning: ['Phone sales'],
@@ -524,10 +530,43 @@ const listings: Listing[] = [
   }),
 ];
 
+const extraListings: Listing[] = NEW_LISTINGS.map((n) => {
+  const company = startups.find((x) => x.id === n.startupId)!;
+  return {
+    ...expand(n),
+    id: n.id,
+    startupId: n.startupId,
+    title: n.title,
+    field: n.field,
+    summary: n.summary,
+    noExperienceRequired: n.noExp,
+    minYear: n.minYear,
+    workMode: n.mode,
+    district: company.district,
+    paid: n.paid ?? n.stipend !== null,
+    stipendMonthly: n.stipend,
+    benefits: company.benefits.slice(0, 4),
+    durationMonths: n.months,
+    hoursPerWeek: n.hours,
+    startDate: daysFromNow(n.deadlineIn + 21),
+    deadline: daysFromNow(n.deadlineIn, 23),
+    openings: n.openings ?? 1,
+    supervisorName: n.supervisor[0],
+    supervisorRole: n.supervisor[1],
+    status: 'open',
+    postedAt: daysFromNow(-n.postedAgo),
+    updatedAt: daysFromNow(-Math.min(n.postedAgo, 3)),
+    isDemo: true,
+  };
+});
+
+const listings: Listing[] = [...originalListings, ...extraListings];
+
 const startupStatus: Record<string, VerificationStatus> = {
   st_wanderlane: 'pending',
   st_mintpot: 'unverified',
   st_orbit: 'unverified',
+  st_chargeway: 'pending',
 };
 
 const listingStatusOverride: Record<string, VerificationStatus> = {
@@ -591,6 +630,7 @@ function student(
     name,
     email,
     universityId: 'uni_bdu',
+    faculty: '',
     major: null,
     year: null,
     skills: [],
@@ -601,6 +641,7 @@ function student(
     experienceNote: '',
     about: '',
     portfolioUrl: '',
+    resume: null,
     prefs: { workModes: [], paidOnly: false, maxDurationMonths: null },
     updatedAt: daysFromNow(-6),
     isDemo: true,
@@ -610,6 +651,7 @@ function student(
 
 const students: Student[] = [
   student('s_ploy', 'u_ploy', 'Ploy S. (demo)', 'ploy@student.example', {
+    faculty: 'Faculty of Commerce and Accountancy',
     major: 'marketing',
     year: 2,
     skills: ['communication', 'social_media', 'canva', 'writing', 'content_creation', 'english'],
@@ -622,6 +664,7 @@ const students: Student[] = [
     prefs: { workModes: ['onsite', 'hybrid'], paidOnly: false, maxDurationMonths: 4 },
   }),
   student('s_tan', 'u_tan', 'Tan K. (demo)', 'tan@student.example', {
+    faculty: 'Faculty of Engineering',
     major: 'cs',
     year: 3,
     skills: ['javascript', 'react', 'html_css', 'python', 'problem_solving'],
@@ -634,6 +677,7 @@ const students: Student[] = [
     prefs: { workModes: ['hybrid', 'remote'], paidOnly: true, maxDurationMonths: 6 },
   }),
   student('s_mild', 'u_mild', 'Mild T. (demo)', 'mild@student.example', {
+    faculty: 'Faculty of Commerce and Accountancy',
     major: 'finance',
     year: 3,
     skills: ['excel', 'accounting', 'financial_modelling', 'presentation'],
@@ -646,6 +690,7 @@ const students: Student[] = [
     prefs: { workModes: ['onsite', 'hybrid'], paidOnly: true, maxDurationMonths: 4 },
   }),
   student('s_beam', 'u_beam', 'Beam R. (demo)', 'beam@student.example', {
+    faculty: 'Faculty of Communication Arts',
     major: 'commarts',
     year: 2,
     skills: ['writing', 'communication', 'social_media', 'video_editing'],
@@ -695,6 +740,7 @@ function application(
     motivation,
     availableFrom: 'From the listed start date',
     portfolioUrl: '',
+    resume: null,
     appliedAt,
     updatedAt: last.at,
     events,
@@ -762,6 +808,21 @@ const applications: Application[] = [
       { at: daysFromNow(-1, 12), status: 'offer', actor: 'startup', message: 'We would like to offer you the internship. Please reply within five days.' },
     ],
   ),
+  {
+    id: 'a_ploy_sw_draft',
+    listingId: 'l_sw_mkt',
+    startupId: 'st_siamweave',
+    studentId: 's_ploy',
+    status: 'draft',
+    motivation: 'I shop at Siam Weave and I have noticed how the store windows change each season.',
+    availableFrom: 'From the listed start date',
+    portfolioUrl: '',
+    resume: null,
+    appliedAt: daysFromNow(-1, 20),
+    updatedAt: daysFromNow(-1, 20),
+    events: [],
+    interview: null,
+  }
 ];
 
 export function createSeed(): Database {
@@ -814,6 +875,7 @@ export function createSeed(): Database {
     ],
     reports: [],
     recentlyViewed: { u_ploy: ['l_kradan_mkt', 'l_green_social', 'l_klinik_pm'] },
+    recentCompanies: { u_ploy: ['st_kradan', 'st_greenloop', 'st_saeng'] },
     compare: [],
   };
 }

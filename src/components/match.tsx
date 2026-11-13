@@ -113,7 +113,7 @@ export function MatchRing({ score, size = 44 }: { score: number; size?: number }
   const stroke = size >= 64 ? 6 : 4;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const tone = score >= 75 ? 'var(--green-mid)' : score >= 50 ? '#a8842c' : '#a9ada5';
+  const tone = score >= 75 ? 'var(--brand-mid)' : score >= 50 ? '#a8842c' : '#a9ada5';
   return (
     <span className="match-ring" style={{ width: size, height: size }} role="img" aria-label={t.listing.matchAria(score)}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">

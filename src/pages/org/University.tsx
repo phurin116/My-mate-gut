@@ -4,9 +4,11 @@ import { formatDate, nowISO } from '../../domain/dates';
 import { profileCompleteness } from '../../domain/matching';
 import type { ApplicationStatus } from '../../domain/types';
 import { TrustBadge } from '../../components/trust';
-import { Button, EmptyState, Monogram, PageHead, useToast } from '../../components/ui';
+import { Button, EmptyState, PageHead, useToast } from '../../components/ui';
+import { CompanyLogo } from '../../components/CompanyLogo';
 import { listingStatus, startupStatus, useSession } from '../../data/selectors';
 import { useT } from '../../i18n';
+import { saveFile } from '../../data/download';
 
 const REACHED_INTERVIEW: ApplicationStatus[] = ['interview', 'offer', 'accepted', 'completed', 'declined'];
 const REACHED_OFFER: ApplicationStatus[] = ['offer', 'accepted', 'completed', 'declined'];
@@ -29,7 +31,7 @@ export default function University() {
 
   const students = db.students.filter((s) => s.universityId === university.id);
   const ids = new Set(students.map((s) => s.id));
-  const applications = db.applications.filter((a) => ids.has(a.studentId));
+  const applications = db.applications.filter((a) => ids.has(a.studentId) && a.status !== 'draft');
   // An application counts for a stage if it ever reached it, not only if it is there now.
   const reached = (statuses: ApplicationStatus[]) =>
     applications.filter((a) => a.events.some((e) => statuses.includes(e.status))).length;
@@ -85,31 +87,11 @@ export default function University() {
     ];
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const filename = `placement-report-${nowISO().slice(0, 10)}.csv`;
-
-    // Inside the Claude artifact viewer, files must be offered through its downloads capability.
-    const host = (window as unknown as { claude?: { use?: (name: string) => Promise<unknown> } }).claude;
-    if (host?.use) {
-      const downloads = (await host.use('downloads')) as {
-        save: (r: { filename: string; data: string }) => Promise<unknown>;
-      } | null;
-      if (downloads) {
-        try {
-          await downloads.save({ filename, data: csv });
-          toast(u.exported);
-        } catch (e) {
-          if ((e as { code?: string })?.code !== 'declined') toast(u.exportFailed, { kind: 'error' });
-        }
-        return;
-      }
+    try {
+      if (await saveFile(filename, new Blob([csv], { type: 'text/csv;charset=utf-8' }))) toast(u.exported);
+    } catch {
+      toast(u.exportFailed, { kind: 'error' });
     }
-
-    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-    toast(u.exported);
   };
 
   return (
@@ -196,7 +178,7 @@ export default function University() {
                     <tr key={startup.id}>
                       <th scope="row">
                         <span className="row">
-                          <Monogram name={startup.name} hue={startup.hue} size="sm" />
+                          <CompanyLogo company={startup} size={32} />
                           <span>{startup.name}</span>
                         </span>
                       </th>

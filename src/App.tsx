@@ -11,6 +11,7 @@ import InternshipDetail from './pages/InternshipDetail';
 // Public browsing pages load with the app. Everything else is split out so
 // first paint stays fast on mobile connections.
 const Company = lazy(() => import('./pages/Company'));
+const Companies = lazy(() => import('./pages/Companies'));
 const Compare = lazy(() => import('./pages/Compare'));
 const Trust = lazy(() => import('./pages/Trust'));
 const SignIn = lazy(() => import('./pages/SignIn'));
@@ -74,6 +75,7 @@ const router = createRouter([
       { path: '/internships', element: <Browse /> },
       { path: '/internships/:id', element: <InternshipDetail /> },
       { path: '/internships/:id/apply', element: student(<Apply />) },
+      { path: '/companies', element: page(<Companies />) },
       { path: '/companies/:id', element: page(<Company />) },
       { path: '/compare', element: page(<Compare />) },
       { path: '/trust', element: page(<Trust />) },
