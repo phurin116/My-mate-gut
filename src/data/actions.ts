@@ -140,9 +140,11 @@ export function registerStartup(input: StartupSignup): ID {
       kind: 'startup',
       logo: newCompanyLogo(input.companyName),
       workplace: '',
+      problem: '',
+      products: [],
       benefits: [],
       process: [
-        'Apply on My Mate Gut with your profile and resume',
+        'Apply on Kaona with your profile and resume',
         'The hiring team reviews your application',
         'Interview with the team',
         'Decision and offer',

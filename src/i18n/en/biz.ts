@@ -14,9 +14,9 @@ export const biz = {
     },
     statusNotice: {
       pending:
-        'Your company is waiting for verification. Listings are visible to students with a "Verification pending" label until our team finishes its checks.',
+        'Your startup is waiting for verification. Listings are visible to students with a "Verification pending" label until our team finishes its checks.',
       unverified:
-        'Your company is not verified. Students see an "Unverified" warning on your listings. Contact the verification team to start the checks.',
+        'Your startup is not verified. Students see an "Unverified" warning on your listings. Contact the verification team to start the checks.',
     },
     table: {
       role: 'Role',
@@ -38,7 +38,7 @@ export const biz = {
     emptyTitle: 'Post your first internship',
     emptyBody:
       'Describe what the intern will actually do and who will supervise them. Clear listings are verified faster and receive better applications.',
-    noAccess: 'This listing belongs to another company.',
+    noAccess: 'This listing belongs to another startup.',
   },
 
   listingForm: {
@@ -137,7 +137,7 @@ export const biz = {
       offer: 'The student can accept or decline the offer on the platform.',
       reject: 'The student will be told they were not selected. A short, kind reason helps them improve.',
       complete:
-        'Confirm only when the student has finished the internship. This allows them to publish a confirmed intern review of your company.',
+        'Confirm only when the student has finished the internship. This allows them to publish a confirmed intern review of your startup.',
     },
     message: 'Message to the student',
     messageHelp: 'Shown on their application page.',
@@ -155,19 +155,19 @@ export const biz = {
   },
 
   companyForm: {
-    title: 'Company profile',
-    lead: 'What students see on your company page.',
-    nameLocked: 'The company name is part of your verification record. Contact the verification team to change it.',
+    title: 'Startup profile',
+    lead: 'What students see on your startup page.',
+    nameLocked: 'The startup name is part of your verification record. Contact the verification team to change it.',
     stage: 'Stage',
     stagePlaceholder: 'For example: Seed',
-    saved: 'Company profile saved.',
+    saved: 'Startup profile saved.',
     viewPublic: 'View public profile',
     verification: 'Verification status',
   },
 
   university: {
     eyebrow: 'Placement outcome report',
-    lead: 'Aggregate results for your students on My Mate Gut. Updated as applications progress.',
+    lead: 'Aggregate results for your students on Kaona. Updated as applications progress.',
     asOf: (date: string) => `As of ${date}`,
     export: 'Export CSV',
     exported: 'Report downloaded.',
@@ -199,9 +199,9 @@ export const biz = {
 
   admin: {
     title: 'Verification queue',
-    lead: 'Check companies and listings against the checklist. A verified label is only applied when every item is confirmed.',
+    lead: 'Check startups and listings against the checklist. A verified label is only applied when every item is confirmed.',
     tabs: { queue: 'Waiting for review', all: 'All records', reports: 'Reports' },
-    company: 'Company',
+    company: 'Startup',
     listing: 'Listing',
     view: 'View public page',
     submittedBy: (company: string) => `Posted by ${company}`,
@@ -217,10 +217,10 @@ export const biz = {
     rejected: 'Marked as unverified.',
     rechecked: 'Re-check recorded.',
     queueEmptyTitle: 'The queue is clear',
-    queueEmptyBody: 'New companies and new or edited listings appear here for review.',
-    companyNotVerified: 'The company behind this listing is not verified yet, so students will not see a verified label even if you approve the listing.',
+    queueEmptyBody: 'New startups and new or edited listings appear here for review.',
+    companyNotVerified: 'The startup behind this listing is not verified yet, so students will not see a verified label even if you approve the listing.',
     reportsEmptyTitle: 'No reports',
-    reportsEmptyBody: 'Reports sent by students from listing and company pages appear here.',
+    reportsEmptyBody: 'Reports sent by students from listing and startup pages appear here.',
     reportedOn: (date: string) => `Reported ${date}`,
     reporter: 'Reporter',
     anonymous: 'Not signed in',

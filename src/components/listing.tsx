@@ -116,20 +116,30 @@ export function InternshipCard({
 
   return (
     <article className="icard">
-      <div className="icard-top">
-        {startup && <CompanyLogo company={startup} />}
+      <div className="icard-startup">
+        {startup && <CompanyLogo company={startup} size={40} />}
         <div className="grow">
-          <h3 className="icard-title">
-            <Link to={`/internships/${listing.id}`} state={{ from: location.pathname + location.search }}>
-              {listing.title}
-            </Link>
-          </h3>
-          <p className="icard-company">
-            <span className="truncate">{startup?.name}</span>
+          <p className="icard-company truncate">{startup?.name}</p>
+          <p className="icard-industry truncate">
+            {startup ? `${t.industries[startup.industry]} · ${t.companyKinds[startup.kind]}` : ''}
           </p>
         </div>
         {match?.score != null && <MatchRing score={match.score} />}
       </div>
+
+      <h3 className="icard-title">
+        <Link to={`/internships/${listing.id}`} state={{ from: location.pathname + location.search }}>
+          {listing.title}
+        </Link>
+      </h3>
+
+      <p className="icard-summary">{listing.summary}</p>
+
+      {startup && (
+        <p className="icard-about">
+          <span>{startup.name}:</span> {startup.tagline}
+        </p>
+      )}
 
       <div className="icard-trust">
         <TrustBadge status={status} kind="listing" />
@@ -137,8 +147,6 @@ export function InternshipCard({
         {isNew(listing) && <span className="tag tag-blue">{t.listing.newBadge}</span>}
         {match && !match.eligible && <span className="tag tag-amber">{t.listing.notEligible}</span>}
       </div>
-
-      <p className="icard-summary">{listing.summary}</p>
 
       {reason && (
         <p className="icard-reason">

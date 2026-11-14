@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Briefcase, MapPin } from 'lucide-react';
+import { Briefcase, MapPin, Sprout, Users } from 'lucide-react';
 import type { Startup } from '../domain/types';
 import { companyOpenListings, startupStatus, useSession } from '../data/selectors';
 import { useT } from '../i18n';
@@ -20,13 +20,19 @@ export function CompanyCard({ company, compact }: { company: Startup; compact?: 
           <h3 className="ccard-name">
             <Link to={`/companies/${company.id}`}>{company.name}</Link>
           </h3>
-          <p className="small muted">
-            {t.industries[company.industry]} · {t.companyKinds[company.kind]}
-          </p>
+          <p className="ccard-industry">{t.industries[company.industry]}</p>
         </div>
       </div>
       {!compact && <p className="ccard-tagline">{company.tagline}</p>}
       <div className="ccard-meta">
+        <span>
+          <Sprout size={14} aria-hidden="true" />
+          {company.stage || t.companyKinds[company.kind]}
+        </span>
+        <span>
+          <Users size={14} aria-hidden="true" />
+          {company.teamSize}
+        </span>
         <span>
           <MapPin size={14} aria-hidden="true" />
           {company.district}

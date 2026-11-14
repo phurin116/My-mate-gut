@@ -30,31 +30,18 @@ export type FieldId =
   | 'sales'
   | 'supply_chain';
 
+/** The ten startup sectors used across discovery, filters and matching. */
 export type IndustryId =
   | 'fintech'
-  | 'ecommerce'
-  | 'edtech'
   | 'healthtech'
-  | 'foodtech'
-  | 'travel'
-  | 'sustainability'
+  | 'edtech'
+  | 'ecommerce'
+  | 'ai'
   | 'saas'
-  | 'media'
-  | 'logistics'
-  | 'proptech'
-  | 'retail'
-  | 'consulting'
-  | 'hospitality'
-  | 'fmcg'
-  | 'agency'
-  | 'telecom'
-  | 'hrtech'
-  | 'mobility'
-  | 'financial_services'
-  | 'design_studio'
-  | 'events'
-  | 'analytics'
-  | 'accounting';
+  | 'foodtech'
+  | 'climate'
+  | 'creative'
+  | 'logistics';
 
 export type MajorId =
   | 'business'
@@ -152,6 +139,10 @@ export interface Startup {
   kind: CompanyKind;
   logo: LogoSpec;
   workplace: string;
+  /** The problem the startup exists to solve, in one or two sentences. */
+  problem: string;
+  /** Products or services the startup offers. */
+  products: string[];
   benefits: string[];
   /** Steps of the company's hiring process, in order. */
   process: string[];

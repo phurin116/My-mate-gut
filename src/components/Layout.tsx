@@ -55,21 +55,23 @@ function useNavItems(): NavItem[] {
   }
 }
 
+/** Kaona mark: a "K" whose upper stroke rises forward. Kaona comes from the Thai for "to move forward". */
+export function BrandMark({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="6" fill="var(--navy, #101D35)" />
+      <path d="M10.5 7.5v17" fill="none" stroke="#ffffff" strokeWidth="2.8" strokeLinecap="square" />
+      <path d="M11 18.5 21.5 8" fill="none" stroke="#ffffff" strokeWidth="2.8" strokeLinecap="square" />
+      <path d="M15.6 14.6 21.8 24.4" fill="none" stroke="#8FB1E3" strokeWidth="2.8" strokeLinecap="square" />
+    </svg>
+  );
+}
+
 function Logo() {
   const t = useT();
   return (
     <Link to="/" className="logo" aria-label={`${t.brand}. ${t.nav.home}`}>
-      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="var(--brand)" />
-        <path
-          d="M8 22V10l8 7 8-7v12"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <BrandMark />
       <span>{t.brand}</span>
     </Link>
   );

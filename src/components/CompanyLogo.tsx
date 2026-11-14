@@ -1,5 +1,15 @@
 import {
   Activity,
+  Bike,
+  Bot,
+  Coins,
+  GraduationCap,
+  HeartPulse,
+  Package,
+  Pill,
+  Salad,
+  ScanEye,
+  SolarPanel,
   BarChart3,
   BookOpen,
   Cloud,
@@ -52,10 +62,20 @@ const ICONS: Record<string, LucideIcon> = {
   moon: Moon,
   sofa: Sofa,
   bolt: Zap,
+  heart: HeartPulse,
+  pill: Pill,
+  cap: GraduationCap,
+  coins: Coins,
+  bot: Bot,
+  scan: ScanEye,
+  salad: Salad,
+  panel: SolarPanel,
+  box: Package,
+  bike: Bike,
 };
 
 const FONTS = {
-  sans: "'Plus Jakarta Sans Variable', 'Inter Variable', system-ui, sans-serif",
+  sans: "'Inter Variable', system-ui, sans-serif",
   serif: "Georgia, 'Times New Roman', serif",
   mono: "ui-monospace, 'SFMono-Regular', Menlo, monospace",
 };
@@ -65,7 +85,7 @@ function radiusFor(shape: LogoSpec['shape'], size: number): string {
     case 'circle':
       return '50%';
     case 'pill':
-      return `${size * 0.32}px`;
+      return `${size * 0.3}px`;
     case 'tab':
       return `${size * 0.36}px ${size * 0.12}px ${size * 0.36}px ${size * 0.12}px`;
     default:

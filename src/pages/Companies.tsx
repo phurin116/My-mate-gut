@@ -4,6 +4,7 @@ import { Building2, Search, X } from 'lucide-react';
 import { COMPANY_KINDS, INDUSTRIES } from '../domain/catalog';
 import type { CompanyKind, IndustryId } from '../domain/types';
 import { CompanyCard } from '../components/company';
+import { INDUSTRY_ICONS } from '../components/industryIcons';
 import { Button, EmptyState, PageHead, useDemoLoading, Skeleton } from '../components/ui';
 import { companyOpenListings, startupStatus, useSession } from '../data/selectors';
 import { useT } from '../i18n';
@@ -57,6 +58,21 @@ export default function Companies() {
     <div className="container page">
       <PageHead title={c.title} lead={c.lead} />
 
+      <nav className="industry-rail" aria-label={c.byIndustry}>
+        <button type="button" className="industry-pill" aria-pressed={!industry} onClick={() => update({ industry: '' })}>
+          {c.allIndustries}
+        </button>
+        {industriesInUse.map((i) => {
+          const Icon = INDUSTRY_ICONS[i];
+          return (
+            <button key={i} type="button" className="industry-pill" aria-pressed={industry === i} onClick={() => update({ industry: industry === i ? '' : i })}>
+              <Icon size={16} aria-hidden="true" strokeWidth={1.7} />
+              {t.industries[i]}
+            </button>
+          );
+        })}
+      </nav>
+
       <div className="company-toolbar">
         <div className="search-input">
           <Search size={18} aria-hidden="true" />
@@ -77,17 +93,6 @@ export default function Companies() {
             </button>
           )}
         </div>
-        <label className="sr-only" htmlFor="company-industry">
-          {c.industry}
-        </label>
-        <select id="company-industry" className="select" value={industry} onChange={(e) => update({ industry: e.target.value })}>
-          <option value="">{c.allIndustries}</option>
-          {industriesInUse.map((i) => (
-            <option key={i} value={i}>
-              {t.industries[i]}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="company-filters">

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router';
-import { ArrowLeft, Briefcase, Building2, Check, ExternalLink, Gift, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Briefcase, Building2, Check, ExternalLink, Gift, Lightbulb, MessageSquare } from 'lucide-react';
 import type { SkillId } from '../domain/catalog';
 import { CompanyLogo } from '../components/CompanyLogo';
 import { InternshipCard } from '../components/listing';
@@ -38,11 +38,14 @@ export default function Company() {
   const reviews = db.reviews.filter((r) => r.startupId === startup.id);
   const average = reviews.length ? Math.round(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : 0;
   const skills = [...new Set(listings.flatMap((l) => l.skills))];
+  // What interns can learn is gathered from the startup's own open roles.
+  const learn = [...new Set(listings.flatMap((l) => l.learning))].slice(0, 6);
   const status = startupStatus(db, startup.id);
 
   const facts: [string, React.ReactNode][] = [
     [c.facts.industry, t.industries[startup.industry]],
     [c.facts.type, t.companyKinds[startup.kind]],
+    [c.facts.funding, startup.stage || c.notStated],
     [c.facts.team, startup.teamSize || c.notStated],
     [c.facts.founded, String(startup.foundedYear)],
     [c.facts.location, `${startup.district}, Bangkok`],
@@ -110,12 +113,49 @@ export default function Company() {
             <p>{startup.about}</p>
           </section>
 
+          {(startup.problem || startup.products.length > 0) && (
+            <section className="detail-section startup-two">
+              {startup.problem && (
+                <div>
+                  <h2>{c.problem}</h2>
+                  <p>{startup.problem}</p>
+                </div>
+              )}
+              {startup.products.length > 0 && (
+                <div>
+                  <h2>{c.products}</h2>
+                  <ul className="bullets">
+                    {startup.products.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          )}
+
           {startup.workplace && (
             <section className="detail-section">
               <h2>{c.workplace}</h2>
               <p>{startup.workplace}</p>
             </section>
           )}
+
+          <section className="detail-section">
+            <h2>{c.learn}</h2>
+            {learn.length > 0 ? (
+              <ul className="learn-list">
+                {learn.map((x) => (
+                  <li key={x}>
+                    <Lightbulb size={16} aria-hidden="true" />
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">{c.learnEmpty}</p>
+            )}
+          </section>
 
           <section className="detail-section">
             <h2>{c.benefits}</h2>

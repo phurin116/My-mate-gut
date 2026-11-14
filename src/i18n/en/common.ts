@@ -16,8 +16,8 @@ import type {
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 export const common = {
-  brand: 'My Mate Gut',
-  brandTagline: 'Startup internships for Bangkok students',
+  brand: 'Kaona',
+  brandTagline: 'Startup internships in Bangkok',
 
   actions: {
     save: 'Save',
@@ -49,7 +49,7 @@ export const common = {
   nav: {
     main: 'Main navigation',
     internships: 'Find Internships',
-    companies: 'Explore Companies',
+    companies: 'Startups',
     forEmployers: 'For employers',
     trust: 'How verification works',
     forStartups: 'For startups',
@@ -61,7 +61,7 @@ export const common = {
     profile: 'Profile',
     notifications: 'Notifications',
     listings: 'Listings',
-    companyProfile: 'Company profile',
+    companyProfile: 'Startup profile',
     report: 'Placement report',
     verificationQueue: 'Verification queue',
     explore: 'Explore',
@@ -81,10 +81,10 @@ export const common = {
   } satisfies Record<Role, string>,
 
   demo: {
-    banner: 'Demo version. All companies and internships are fictional examples, and applications are saved only in this browser.',
-    bannerShort: 'Demo: fictional companies, saved in this browser only.',
+    banner: 'Demo version. All startups and internships are fictional examples, and applications are saved only in this browser.',
+    bannerShort: 'Demo: fictional startups, saved in this browser only.',
     label: 'Demo',
-    labelHelp: 'Fictional demo content. This company, role or person is not real, and no real vacancy exists.',
+    labelHelp: 'Fictional demo content. This startup, role or person is not real, and no real vacancy exists.',
     reset: 'Reset demo data',
     resetTitle: 'Reset demo data?',
     resetBody:
@@ -94,13 +94,13 @@ export const common = {
 
   footer: {
     about:
-      'My Mate Gut connects Bangkok university students with verified, beginner-friendly startup internships.',
+      'Kaona connects Bangkok university students with verified, beginner-friendly startup internships.',
     students: 'Students',
     startups: 'Startups',
     platform: 'Platform',
     browse: 'Browse internships',
     noExperience: 'No experience required',
-    companies: 'Explore companies',
+    companies: 'Explore startups',
     createProfile: 'Create a student profile',
     post: 'Post an internship',
     getVerified: 'Get verified',
@@ -134,36 +134,22 @@ export const common = {
   } satisfies Record<FieldId, string>,
 
   industries: {
-    fintech: 'Fintech',
+    fintech: 'FinTech',
+    healthtech: 'HealthTech',
+    edtech: 'EdTech',
     ecommerce: 'E-commerce',
-    edtech: 'Education',
-    healthtech: 'Health',
-    foodtech: 'Food',
-    travel: 'Travel',
-    sustainability: 'Sustainability',
-    saas: 'Business software',
-    media: 'Media & creators',
-    logistics: 'Logistics',
-    proptech: 'Property',
-    retail: 'Retail',
-    consulting: 'Consulting',
-    hospitality: 'Hotels and hospitality',
-    fmcg: 'Food and consumer goods',
-    agency: 'Marketing agency',
-    telecom: 'Telecommunications',
-    hrtech: 'HR technology',
-    mobility: 'Electric mobility',
-    financial_services: 'Insurance and wealth',
-    design_studio: 'Design studio',
-    events: 'Events',
-    analytics: 'Data and analytics',
-    accounting: 'Accounting services',
+    ai: 'AI and Technology',
+    saas: 'SaaS',
+    foodtech: 'FoodTech',
+    climate: 'ClimateTech',
+    creative: 'Creative and Media',
+    logistics: 'Logistics and Mobility',
   } satisfies Record<IndustryId, string>,
 
   companyKinds: {
-    startup: 'Startup',
-    growing: 'Growing business',
-    established: 'Established company',
+    startup: 'Early-stage startup',
+    growing: 'Growing startup',
+    established: 'Scale-up',
   },
 
   majors: {
@@ -293,9 +279,9 @@ export const common = {
       unverified: 'Unverified listing',
     } satisfies Record<VerificationStatus, string>,
     companyBadge: {
-      verified: 'Verified company',
+      verified: 'Verified startup',
       pending: 'Verification pending',
-      unverified: 'Unverified company',
+      unverified: 'Unverified startup',
     } satisfies Record<VerificationStatus, string>,
     short: {
       verified: 'Our team checked this against the verification checklist.',
@@ -323,7 +309,7 @@ export const common = {
 
   reportReasons: {
     misleading: 'The description is misleading',
-    fake: 'The company or role may not be real',
+    fake: 'The startup or role may not be real',
     payment: 'Asks applicants to pay or buy something',
     unsafe: 'Unsafe or inappropriate request',
     outdated: 'The listing is outdated',
@@ -332,10 +318,10 @@ export const common = {
 
   report: {
     listing: 'Report this internship',
-    startup: 'Report this company',
+    startup: 'Report this startup',
     titleListing: 'Report this internship',
-    titleStartup: 'Report this company',
-    intro: 'Reports go to the My Mate Gut verification team. The company does not see who reported it.',
+    titleStartup: 'Report this startup',
+    intro: 'Reports go to the Kaona verification team. The startup does not see who reported it.',
     reason: 'What is the problem?',
     details: 'Details',
     detailsHelp: 'Tell us what you saw. Please do not include passwords or ID numbers.',
@@ -372,7 +358,7 @@ export const common = {
       major: (major: string) => `it fits your ${major} studies`,
       skills: (skills: string[]) => `your skills include ${joinList(skills)}`,
       goal: (field: string) => `it supports your goal of working in ${field.toLowerCase()}`,
-      industry: (industry: string) => `you want to work in ${industry.toLowerCase()}`,
+      industry: (industry: string) => `you want to work in ${industry}`,
       eligibilityBeginner: 'you meet all beginner requirements',
       eligibility: 'you meet the experience and year requirements',
       workMode: (mode: string) => `it is ${mode.toLowerCase()}, as you prefer`,
@@ -411,7 +397,7 @@ export const common = {
     studentUpdate: (name: string, status: string) => `${name}: ${status}`,
     reviewInvite: 'Your internship was confirmed as completed. You can now leave a review.',
     verificationRequested: (name: string) => `Verification requested: ${name}`,
-    verificationRequestedBody: 'A new company is waiting for its checks.',
+    verificationRequestedBody: 'A new startup is waiting for its checks.',
     listingReviewBody: 'A new or edited listing is waiting for its checks.',
     verificationResult: (name: string, status: string) => `${name}: ${status}`,
     newReport: 'New report received',

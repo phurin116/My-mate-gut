@@ -27,7 +27,7 @@ import type {
  * Dates are relative to the day the data is first loaded so deadlines stay current.
  */
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 export const DEMO_USER_IDS = {
   student: 'u_ploy',
@@ -92,7 +92,7 @@ const originalStartups: Startup[] = [
     'Seed', '14 people', 2023, 'Napat W.', 'Co-founder, Product',
   ),
   startup(
-    'st_greenloop', 'Greenloop Refill', 'sustainability', 'Thonglor', 130,
+    'st_greenloop', 'Greenloop Refill', 'climate', 'Thonglor', 130,
     'Refill stations for household products in condos and campuses.',
     'Greenloop Refill installs and operates refill stations for detergent, shampoo and dish soap. The company runs 40 stations across Bangkok and is expanding to university dormitories. Interns work directly with the two founders.',
     'Pre-seed', '8 people', 2024, 'Sirin K.', 'Co-founder',
@@ -104,7 +104,7 @@ const originalStartups: Startup[] = [
     'Series A', '32 people', 2021, 'Chanon P.', 'Head of Finance',
   ),
   startup(
-    'st_framehaus', 'Framehaus', 'media', 'Ratchathewi', 20,
+    'st_framehaus', 'Framehaus', 'creative', 'Ratchathewi', 20,
     'Scheduling and analytics tools for independent video creators.',
     'Framehaus makes a planning tool used by small creator teams to schedule shoots, track uploads and read their channel numbers in one place. The content team also runs the company channels, which interns help produce.',
     'Seed', '11 people', 2023, 'Pim T.', 'Head of Content',
@@ -134,13 +134,13 @@ const originalStartups: Startup[] = [
     'Pre-seed', '9 people', 2024, 'Thanakorn J.', 'Co-founder, Growth',
   ),
   startup(
-    'st_baanly', 'Baanly', 'proptech', 'Ekkamai', 280,
+    'st_baanly', 'Baanly', 'ecommerce', 'Ekkamai', 280,
     'Verified room and apartment rentals near Bangkok universities.',
     'Baanly lists rooms near universities with checked photos and clear contract terms. The team is small and cross-functional: one designer, three engineers and a growth team that works closely with student communities.',
     'Seed', '12 people', 2023, 'Mook R.', 'Design Lead',
   ),
   startup(
-    'st_wanderlane', 'Wanderlane', 'travel', 'Silom', 300,
+    'st_wanderlane', 'Wanderlane', 'ecommerce', 'Silom', 300,
     'Small-group local experiences hosted by Bangkok residents.',
     'Wanderlane is a marketplace for half-day local experiences such as market walks and cooking sessions. The company applied for verification recently and its documents are still being checked.',
     'Pre-seed', '6 people', 2025, 'Jirayu B.', 'Founder',
@@ -567,6 +567,7 @@ const startupStatus: Record<string, VerificationStatus> = {
   st_mintpot: 'unverified',
   st_orbit: 'unverified',
   st_chargeway: 'pending',
+  st_carbonly: 'pending',
 };
 
 const listingStatusOverride: Record<string, VerificationStatus> = {
@@ -589,7 +590,7 @@ function verificationRecords(): VerificationRecord[] {
         : status === 'pending'
           ? { registration: true, contact: true }
           : {},
-      verifiedAt: verified ? daysFromNow(-60 + i * 3) : null,
+      verifiedAt: verified ? daysFromNow(-(20 + ((i * 7) % 70))) : null,
       lastCheckedAt: verified ? daysFromNow(-(4 + (i % 5) * 3)) : status === 'pending' ? daysFromNow(-2) : null,
       reviewerNote:
         status === 'pending'
@@ -656,7 +657,7 @@ const students: Student[] = [
     year: 2,
     skills: ['communication', 'social_media', 'canva', 'writing', 'content_creation', 'english'],
     interests: ['marketing', 'content'],
-    industries: ['edtech', 'media', 'sustainability'],
+    industries: ['edtech', 'creative', 'climate'],
     careerGoal: 'marketing',
     experience: 'none',
     experienceNote: 'Publicity lead for the faculty marketing club. No work experience yet.',
@@ -695,7 +696,7 @@ const students: Student[] = [
     year: 2,
     skills: ['writing', 'communication', 'social_media', 'video_editing'],
     interests: ['content', 'marketing'],
-    industries: ['edtech', 'media'],
+    industries: ['edtech', 'creative'],
     careerGoal: 'content',
     experience: 'none',
     experienceNote: '',
@@ -712,7 +713,7 @@ const users: User[] = [
   { id: 'u_kradan', role: 'startup', name: 'Napat W. (demo)', email: 'napat@kradan.example', startupId: 'st_kradan', isDemo: true },
   { id: 'u_paysabai', role: 'startup', name: 'Chanon P. (demo)', email: 'chanon@paysabai.example', startupId: 'st_paysabai', isDemo: true },
   { id: 'u_bdu', role: 'university', name: 'Career Office (demo)', email: 'careers@bdu.example', universityId: 'uni_bdu', isDemo: true },
-  { id: 'u_verify', role: 'admin', name: 'Verification Team (demo)', email: 'verify@mymategut.example', isDemo: true },
+  { id: 'u_verify', role: 'admin', name: 'Verification Team (demo)', email: 'verify@kaona.example', isDemo: true },
 ];
 
 function application(
@@ -814,7 +815,7 @@ const applications: Application[] = [
     startupId: 'st_siamweave',
     studentId: 's_ploy',
     status: 'draft',
-    motivation: 'I shop at Siam Weave and I have noticed how the store windows change each season.',
+    motivation: 'I shop at Threadline and I like how each small collection sells out and comes back based on what customers ask for.',
     availableFrom: 'From the listed start date',
     portfolioUrl: '',
     resume: null,

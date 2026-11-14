@@ -1,10 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import { Search, SearchX, SlidersHorizontal, X } from 'lucide-react';
-import { FIELDS, INDUSTRIES, PAY_STEPS, WORK_MODES, type SkillId } from '../domain/catalog';
+import { COMPANY_KINDS, FIELDS, INDUSTRIES, PAY_STEPS, WORK_MODES, type SkillId } from '../domain/catalog';
 import { formatBaht } from '../domain/dates';
 import { profileCompleteness } from '../domain/matching';
-import type { FieldId, IndustryId, Listing, WorkMode } from '../domain/types';
+import type { CompanyKind, FieldId, IndustryId, Listing, WorkMode } from '../domain/types';
 import { InternshipCard, InternshipCardSkeleton, InternshipRow } from '../components/listing';
 import { Button, ButtonLink, Dialog, EmptyState, PageHead, useDemoLoading } from '../components/ui';
 import { isClosingSoon, isNew, isOpen, listingStatus, matchFor, startupOf, useSession } from '../data/selectors';
@@ -24,6 +24,7 @@ interface Filters {
   dur: '' | 'short' | 'long';
   exp: '' | 'none' | 'some';
   industry: IndustryId[];
+  stage: CompanyKind[];
   toggles: Record<Toggle, boolean>;
   sort: Sort | '';
 }
@@ -37,6 +38,7 @@ const EMPTY: Filters = {
   dur: '',
   exp: '',
   industry: [],
+  stage: [],
   toggles: { verified: false, closing: false, recent: false },
   sort: '',
 };
@@ -59,6 +61,7 @@ function readFilters(params: URLSearchParams): Filters {
     dur: dur === 'short' || dur === 'long' ? dur : '',
     exp: exp === 'none' || exp === 'some' ? exp : '',
     industry: list(params, 'industry', INDUSTRIES),
+    stage: list(params, 'stage', COMPANY_KINDS),
     toggles: Object.fromEntries(TOGGLES.map((k) => [k, params.get(k) === '1'])) as Record<Toggle, boolean>,
     sort: sort && SORTS.includes(sort) ? sort : '',
   };
@@ -74,6 +77,7 @@ function writeFilters(f: Filters): URLSearchParams {
   if (f.dur) p.set('dur', f.dur);
   if (f.exp) p.set('exp', f.exp);
   if (f.industry.length) p.set('industry', f.industry.join(','));
+  if (f.stage.length) p.set('stage', f.stage.join(','));
   TOGGLES.forEach((k) => f.toggles[k] && p.set(k, '1'));
   if (f.sort) p.set('sort', f.sort);
   return p;
@@ -83,6 +87,7 @@ const activeCount = (f: Filters) =>
   f.field.length +
   f.mode.length +
   f.industry.length +
+  f.stage.length +
   (f.area ? 1 : 0) +
   (f.pay ? 1 : 0) +
   (f.dur ? 1 : 0) +
@@ -114,15 +119,29 @@ function FilterPanel({ f, set, areas, idPrefix }: { f: Filters; set: (next: Filt
   const t = useT();
   const b = t.pub.browse;
   const [allFields, setAllFields] = useState(false);
-  const [allIndustries, setAllIndustries] = useState(false);
   const fields = allFields ? FIELDS : FIELDS.filter((x, i) => i < 8 || f.field.includes(x));
-  const industries = allIndustries ? INDUSTRIES : INDUSTRIES.filter((x, i) => i < 6 || f.industry.includes(x));
   return (
     <div className="filter-panel">
       <FilterGroup title={b.groups.quick}>
         {TOGGLES.map((k) => (
           <Chip key={k} on={f.toggles[k]} onClick={() => set({ ...f, toggles: { ...f.toggles, [k]: !f.toggles[k] } })}>
             {b.quick[k]}
+          </Chip>
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title={b.groups.industry}>
+        {INDUSTRIES.map((id) => (
+          <Chip key={id} on={f.industry.includes(id)} onClick={() => set({ ...f, industry: toggleIn(f.industry, id) })}>
+            {t.industries[id]}
+          </Chip>
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title={b.groups.stage}>
+        {COMPANY_KINDS.map((id) => (
+          <Chip key={id} on={f.stage.includes(id)} onClick={() => set({ ...f, stage: toggleIn(f.stage, id) })}>
+            {t.companyKinds[id]}
           </Chip>
         ))}
       </FilterGroup>
@@ -192,16 +211,6 @@ function FilterPanel({ f, set, areas, idPrefix }: { f: Filters; set: (next: Filt
         ))}
       </FilterGroup>
 
-      <FilterGroup title={b.groups.industry}>
-        {industries.map((id) => (
-          <Chip key={id} on={f.industry.includes(id)} onClick={() => set({ ...f, industry: toggleIn(f.industry, id) })}>
-            {t.industries[id]}
-          </Chip>
-        ))}
-        <button type="button" className="link-arrow" onClick={() => setAllIndustries((v) => !v)}>
-          {allIndustries ? b.showFewer : b.showAll(INDUSTRIES.length)}
-        </button>
-      </FilterGroup>
     </div>
   );
 }
@@ -230,6 +239,7 @@ export function matchesFilters(listing: Listing, f: Filters, db: ReturnType<type
   if (f.area && f.area !== 'remote' && (listing.workMode === 'remote' || listing.district !== f.area)) return false;
   if (f.mode.length && !f.mode.includes(listing.workMode)) return false;
   if (f.industry.length && (!s || !f.industry.includes(s.industry))) return false;
+  if (f.stage.length && (!s || !f.stage.includes(s.kind))) return false;
   if (f.pay === 'paid' && !listing.paid) return false;
   if (f.pay && f.pay !== 'paid' && (listing.stipendMonthly ?? 0) < Number(f.pay)) return false;
   if (f.dur === 'short' && listing.durationMonths > 3) return false;
@@ -294,6 +304,7 @@ export default function Browse() {
     ...f.mode.map((id) => ({ key: id, label: t.workModes[id], clear: () => set({ ...f, mode: toggleIn(f.mode, id) }) })),
     ...(f.dur ? [{ key: 'dur', label: b.durations[f.dur], clear: () => set({ ...f, dur: '' }) }] : []),
     ...f.industry.map((id) => ({ key: id, label: t.industries[id], clear: () => set({ ...f, industry: toggleIn(f.industry, id) }) })),
+    ...f.stage.map((id) => ({ key: id, label: t.companyKinds[id], clear: () => set({ ...f, stage: toggleIn(f.stage, id) }) })),
   ];
 
   const quickRow: { label: string; on: boolean; toggle: () => void }[] = [

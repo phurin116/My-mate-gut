@@ -1,13 +1,13 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { ArrowRight, BadgeCheck, CalendarClock, ClipboardList, FileText, ListChecks, Search, Sparkles, UserRound } from 'lucide-react';
-import { FIELDS } from '../domain/catalog';
+import { ArrowRight, ArrowUpRight, Compass, Hammer, Layers, Network, Rocket, Search, Users } from 'lucide-react';
+import { FIELDS, INDUSTRIES } from '../domain/catalog';
 import { isRecommended } from '../domain/matching';
-import type { FieldId, Listing } from '../domain/types';
+import type { Listing } from '../domain/types';
 import { CompanyCard } from '../components/company';
 import { CompanyLogo } from '../components/CompanyLogo';
-import { FIELD_ICONS } from '../components/fieldIcons';
-import { DeadlineTag, InternshipCard, stipendText } from '../components/listing';
+import { INDUSTRY_ICONS } from '../components/industryIcons';
+import { InternshipCard } from '../components/listing';
 import { ButtonLink } from '../components/ui';
 import {
   applicationFor,
@@ -17,7 +17,7 @@ import {
   isOpen,
   listingStatus,
   matchFor,
-  startupOf,
+  startupStatus,
   useSession,
 } from '../data/selectors';
 import { useT } from '../i18n';
@@ -33,9 +33,11 @@ export default function Home() {
   const [field, setField] = useState('');
   const [area, setArea] = useState('');
 
+  // Everything below is counted from the live data, so the numbers always match the platform.
   const open = useMemo(() => db.listings.filter(isOpen), [db.listings]);
   const areas = useMemo(() => [...new Set(open.filter((l) => l.workMode !== 'remote').map((l) => l.district))].sort(), [open]);
   const byDeadline = [...open].sort((a, b) => a.deadline.localeCompare(b.deadline));
+  const hiring = db.startups.map((s) => ({ s, n: companyOpenListings(db, s.id).length })).filter((x) => x.n > 0);
 
   const groups: Record<Tab, Listing[]> = {
     forYou: student
@@ -48,7 +50,9 @@ export default function Home() {
       : [],
     featured: open
       .filter((l) => listingStatus(db, l) === 'verified' && l.stipendMonthly && l.supervisorName && !isClosingSoon(l))
-      .sort((a, b) => Number(b.noExperienceRequired) - Number(a.noExperienceRequired) || (b.stipendMonthly ?? 0) - (a.stipendMonthly ?? 0)),
+      .sort((a, b) => Number(b.noExperienceRequired) - Number(a.noExperienceRequired) || (b.stipendMonthly ?? 0) - (a.stipendMonthly ?? 0))
+      // At most one role per startup and per category, so the featured row shows the range of the platform.
+      .filter((l, i, all) => all.findIndex((x) => x.startupId === l.startupId || x.field === l.field) === i),
     beginner: byDeadline.filter((l) => l.noExperienceRequired && listingStatus(db, l) !== 'unverified'),
     recent: [...open].filter(isNew).sort((a, b) => b.postedAt.localeCompare(a.postedAt)),
     closing: byDeadline.filter(isClosingSoon),
@@ -57,25 +61,25 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>(tabs[0]);
   const shown = groups[tab].slice(0, 6);
 
-  const categoryCounts = FIELDS.map((f) => ({ f, n: open.filter((l) => l.field === f).length }))
-    .filter((x) => x.n > 0)
-    .slice(0, 12);
+  const industries = INDUSTRIES.map((id) => ({
+    id,
+    startups: db.startups.filter((s) => s.industry === id).length,
+    roles: open.filter((l) => db.startups.find((s) => s.id === l.startupId)?.industry === id).length,
+  })).filter((x) => x.startups > 0);
 
-  const popular = [...db.startups]
-    .map((s) => ({ s, n: companyOpenListings(db, s.id).length }))
-    .filter((x) => x.n > 0)
-    .sort((a, b) => b.n - a.n || a.s.name.localeCompare(b.s.name))
-    .slice(0, 6)
-    .map((x) => x.s);
+  // One verified, hiring startup from each of several industries for the hero panel and the showcase.
+  const verifiedHiring = hiring.filter((x) => startupStatus(db, x.s.id) === 'verified').sort((a, b) => b.n - a.n || a.s.name.localeCompare(b.s.name));
+  const spotlight: typeof verifiedHiring = [];
+  for (const x of verifiedHiring) if (!spotlight.some((y) => y.s.industry === x.s.industry)) spotlight.push(x);
+  const heroStartups = spotlight.slice(0, 4);
+  const showcase = spotlight.slice(0, 6).map((x) => x.s);
 
   const stats = [
     { value: open.length, label: h.stats.open },
-    { value: new Set(open.map((l) => l.startupId)).size, label: h.stats.companies },
+    { value: hiring.length, label: h.stats.companies },
+    { value: industries.length, label: h.stats.industries },
     { value: open.filter((l) => l.noExperienceRequired).length, label: h.stats.noExperience },
-    { value: open.filter((l) => l.paid).length, label: h.stats.paid },
   ];
-
-  const preview = groups.closing.slice(0, 3);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -88,22 +92,21 @@ export default function Home() {
 
   const popularSearches: [string, string][] = [
     [t.fields.marketing, '/internships?field=marketing,digital_marketing,social_media'],
+    [t.fields.engineering, '/internships?field=engineering'],
     [t.fields.data, '/internships?field=data'],
-    [t.fields.graphic_design, '/internships?field=graphic_design,ux_design'],
     [t.listing.noExperience, '/internships?exp=none'],
     [t.workModes.remote, '/internships?mode=remote'],
   ];
 
-  const reasonIcons = [Sparkles, BadgeCheck, ListChecks, ClipboardList];
-  const stepIcons = [UserRound, Search, FileText, CalendarClock];
+  const reasonIcons = [Hammer, Users, Rocket, Layers, Compass, Network];
 
   return (
     <>
       <section className="hero">
         <div className="container hero-grid">
           <div className="hero-main">
-            <p className="hero-badge">{h.badge}</p>
-            <h1 className="display hero-title">{h.title}</h1>
+            <p className="hero-eyebrow">{h.eyebrow}</p>
+            <h1 className="hero-title">{h.title}</h1>
             <p className="hero-lead">{h.lead}</p>
 
             <form className="hero-search" role="search" onSubmit={onSearch}>
@@ -112,14 +115,7 @@ export default function Home() {
                 <label className="sr-only" htmlFor="home-q">
                   {h.searchLabel}
                 </label>
-                <input
-                  id="home-q"
-                  type="search"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder={h.searchPlaceholder}
-                  autoComplete="off"
-                />
+                <input id="home-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={h.searchPlaceholder} autoComplete="off" />
               </div>
               <label className="sr-only" htmlFor="home-field">
                 {h.fieldLabel}
@@ -145,85 +141,83 @@ export default function Home() {
                 ))}
               </select>
               <button type="submit" className="btn btn-primary btn-lg">
-                <Search size={18} aria-hidden="true" />
                 {h.search}
               </button>
             </form>
 
             <div className="hero-popular">
-              <span className="small muted">{h.popular}</span>
+              <span>{h.popular}</span>
               {popularSearches.map(([label, to]) => (
-                <Link key={label} to={to} className="hero-popular-link">
+                <Link key={label} to={to}>
                   {label}
                 </Link>
               ))}
             </div>
-
-            <dl className="hero-stats" aria-label={h.stats.label}>
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <dd>{s.value}</dd>
-                  <dt>{s.label}</dt>
-                </div>
-              ))}
-              <div className="hero-stats-note">
-                <span className="tag tag-demo">{h.stats.label}</span>
-              </div>
-            </dl>
           </div>
 
-          {preview.length > 0 && (
-            <aside className="hero-preview" aria-label={h.previewTitle}>
-              <p className="eyebrow">{h.previewTitle}</p>
-              {preview.map((l) => {
-                const s = startupOf(db, l);
-                return (
-                  <Link key={l.id} to={`/internships/${l.id}`} className="preview-card">
-                    {s && <CompanyLogo company={s} size={40} />}
+          <aside className="hero-panel" aria-label={h.hiringNow}>
+            <div className="hero-panel-head">
+              <span>{h.hiringNow}</span>
+              <Link to="/companies?hiring=1">
+                {h.allStartups}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </Link>
+            </div>
+            <ul>
+              {heroStartups.map(({ s, n }) => (
+                <li key={s.id}>
+                  <Link to={`/companies/${s.id}`} className="hero-startup">
+                    <CompanyLogo company={s} size={40} />
                     <span className="grow">
-                      <span className="preview-title">{l.title}</span>
-                      <span className="small muted">
-                        {s?.name} · {stipendText(t, l)}
+                      <span className="hero-startup-name">{s.name}</span>
+                      <span className="hero-startup-meta">
+                        {t.industries[s.industry]} · {s.stage}
                       </span>
                     </span>
-                    <DeadlineTag listing={l} />
+                    <span className="hero-startup-roles">{h.roles(n)}</span>
                   </Link>
-                );
-              })}
-              <Link to="/internships?closing=1&sort=deadline" className="link-arrow">
-                {h.seeAll}
-                <ArrowRight size={14} aria-hidden="true" />
-              </Link>
-            </aside>
-          )}
+                </li>
+              ))}
+            </ul>
+          </aside>
         </div>
+      </section>
+
+      <section className="stat-strip" aria-label={h.stats.label}>
+        <dl className="container">
+          {stats.map((s) => (
+            <div key={s.label}>
+              <dd>{s.value}</dd>
+              <dt>{s.label}</dt>
+            </div>
+          ))}
+          <div className="stat-strip-note">
+            <span className="tag tag-demo">{h.stats.label}</span>
+          </div>
+        </dl>
       </section>
 
       <div className="container">
         <section className="section">
           <div className="section-head">
             <div>
-              <h2>{h.categories}</h2>
-              <p className="muted">{h.categoriesLead}</p>
+              <h2>{h.industries}</h2>
+              <p className="muted">{h.industriesLead}</p>
             </div>
-            <Link to="/internships" className="link-arrow">
-              {h.allCategories}
+            <Link to="/companies" className="link-arrow">
+              {h.exploreCompanies}
               <ArrowRight size={14} aria-hidden="true" />
             </Link>
           </div>
-          <ul className="cat-grid">
-            {categoryCounts.map(({ f, n }) => {
-              const Icon = FIELD_ICONS[f as FieldId];
+          <ul className="industry-grid">
+            {industries.map(({ id, startups, roles }) => {
+              const Icon = INDUSTRY_ICONS[id];
               return (
-                <li key={f}>
-                  <Link to={`/internships?field=${f}`} className="cat-tile">
-                    <span className="cat-icon" aria-hidden="true">
-                      <Icon size={20} />
-                    </span>
-                    <span className="grow">
-                      <span className="cat-name">{t.fields[f]}</span>
-                      <span className="small muted">{h.roles(n)}</span>
-                    </span>
+                <li key={id}>
+                  <Link to={`/companies?industry=${id}`} className="industry-tile">
+                    <Icon size={22} aria-hidden="true" strokeWidth={1.6} />
+                    <span className="industry-name">{t.industries[id]}</span>
+                    <span className="industry-meta">{h.industryMeta(startups, roles)}</span>
                   </Link>
                 </li>
               );
@@ -271,7 +265,31 @@ export default function Home() {
             )}
           </div>
         </section>
+      </div>
 
+      <section className="why">
+        <div className="container why-grid">
+          <div className="why-intro">
+            <h2>{h.whyTitle}</h2>
+            <p>{h.whyLead}</p>
+            <p className="why-note">{h.whyNote}</p>
+          </div>
+          <ul className="why-list">
+            {h.reasons.map((r, i) => {
+              const Icon = reasonIcons[i];
+              return (
+                <li key={r.title}>
+                  <Icon size={20} aria-hidden="true" strokeWidth={1.6} />
+                  <h3>{r.title}</h3>
+                  <p>{r.body}</p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      <div className="container">
         <section className="section">
           <div className="section-head">
             <div>
@@ -284,55 +302,29 @@ export default function Home() {
             </Link>
           </div>
           <div className="company-grid is-home">
-            {popular.map((s) => (
-              <CompanyCard key={s.id} company={s} compact />
+            {showcase.map((s) => (
+              <CompanyCard key={s.id} company={s} />
             ))}
           </div>
         </section>
 
         <section className="section how">
-          <div>
-            <h2 className="how-title">{h.howTitle}</h2>
-            <ol className="steps">
-              {h.steps.map((step, i) => {
-                const Icon = stepIcons[i];
-                return (
-                  <li key={step.title}>
-                    <span className="step-icon" aria-hidden="true">
-                      <Icon size={18} />
-                    </span>
-                    <div>
-                      <h3>
-                        <span className="step-num">{i + 1}.</span> {step.title}
-                      </h3>
-                      <p className="muted">{step.body}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-          <div>
-            <h2 className="how-title">{h.whyTitle}</h2>
-            <ul className="reasons">
-              {h.reasons.map((r, i) => {
-                const Icon = reasonIcons[i];
-                return (
-                  <li key={r.title}>
-                    <Icon size={20} aria-hidden="true" className="reason-icon" />
-                    <div>
-                      <h3>{r.title}</h3>
-                      <p className="muted">{r.body}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <Link to="/trust" className="link-arrow" style={{ marginTop: 12 }}>
-              {h.trustLink}
-              <ArrowRight size={14} aria-hidden="true" />
-            </Link>
-          </div>
+          <h2>{h.howTitle}</h2>
+          <ol className="steps">
+            {h.steps.map((step, i) => (
+              <li key={step.title}>
+                <span className="step-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))}
+          </ol>
+          <Link to="/trust" className="link-arrow">
+            {h.trustLink}
+            <ArrowRight size={14} aria-hidden="true" />
+          </Link>
         </section>
 
         <section className="section cta-band">
@@ -358,8 +350,7 @@ export default function Home() {
           </div>
           {!user && (
             <p className="cta-employers small">
-              {h.employers}{' '}
-              <Link to="/signin?tab=create&as=startup">{h.employersLink}</Link>
+              {h.employers} <Link to="/signin?tab=create&as=startup">{h.employersLink}</Link>
             </p>
           )}
         </section>
