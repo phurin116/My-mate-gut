@@ -167,7 +167,7 @@ export const biz = {
 
   university: {
     eyebrow: 'Placement outcome report',
-    lead: 'Aggregate results for your students on Kaona. Updated as applications progress.',
+    lead: 'Aggregate results for your students on InternGo. Updated as applications progress.',
     asOf: (date: string) => `As of ${date}`,
     export: 'Export CSV',
     exported: 'Report downloaded.',

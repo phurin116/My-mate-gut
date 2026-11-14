@@ -1,6 +1,6 @@
-# Kaona
+# InternGo
 
-Kaona is a platform that connects Bangkok university students with internships at startups. (The repository keeps its original name, My-mate-gut. The product was renamed to Kaona.)
+InternGo is a platform that connects Bangkok university students with internships at startups. (The repository keeps its original name, My-mate-gut. The product is now called InternGo.)
 
 This is a working prototype that runs in **demo mode**: there is no backend, and everything is stored in the browser (localStorage for data, IndexedDB for uploaded resumes). No passwords or credentials are collected.
 
@@ -38,7 +38,7 @@ The repository includes `netlify.toml`, so Netlify can build and host it with no
 1. Sign in at https://app.netlify.com with your GitHub account.
 2. Choose **Add new site → Import an existing project → GitHub**, then pick `My-mate-gut`.
 3. Set the branch to deploy (`main` after this work is merged, or `claude/vibrant-gates-6z9s64`) and click **Deploy**.
-4. Open **Site configuration → Change site name** and enter a name such as `kaona-bkk`. The site is then at `https://<that-name>.netlify.app` if the name is free.
+4. Open **Site configuration → Change site name** and enter a name such as `interngo-bkk`. The site is then at `https://<that-name>.netlify.app` if the name is free.
 
 Every push to that branch redeploys the site automatically.
 
@@ -77,4 +77,4 @@ src/
 
 ## Brand
 
-The name Kaona comes from the Thai ก้าวหน้า, "to move forward". A quick web search found no obvious conflicting company, but no trademark or company-name check has been done. Do one before launching publicly.
+The product is called InternGo: "intern" plus "go", a short, action-led name for starting a career at a startup. No trademark or company-name check has been done. Do one before launching publicly.

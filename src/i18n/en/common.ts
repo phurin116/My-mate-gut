@@ -16,7 +16,7 @@ import type {
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 export const common = {
-  brand: 'Kaona',
+  brand: 'InternGo',
   brandTagline: 'Startup internships in Bangkok',
 
   actions: {
@@ -94,7 +94,7 @@ export const common = {
 
   footer: {
     about:
-      'Kaona connects Bangkok university students with verified, beginner-friendly startup internships.',
+      'InternGo connects Bangkok university students with verified, beginner-friendly startup internships.',
     students: 'Students',
     startups: 'Startups',
     platform: 'Platform',
@@ -321,7 +321,7 @@ export const common = {
     startup: 'Report this startup',
     titleListing: 'Report this internship',
     titleStartup: 'Report this startup',
-    intro: 'Reports go to the Kaona verification team. The startup does not see who reported it.',
+    intro: 'Reports go to the InternGo verification team. The startup does not see who reported it.',
     reason: 'What is the problem?',
     details: 'Details',
     detailsHelp: 'Tell us what you saw. Please do not include passwords or ID numbers.',

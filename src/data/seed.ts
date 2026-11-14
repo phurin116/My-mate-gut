@@ -27,7 +27,7 @@ import type {
  * Dates are relative to the day the data is first loaded so deadlines stay current.
  */
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 export const DEMO_USER_IDS = {
   student: 'u_ploy',
@@ -713,7 +713,7 @@ const users: User[] = [
   { id: 'u_kradan', role: 'startup', name: 'Napat W. (demo)', email: 'napat@kradan.example', startupId: 'st_kradan', isDemo: true },
   { id: 'u_paysabai', role: 'startup', name: 'Chanon P. (demo)', email: 'chanon@paysabai.example', startupId: 'st_paysabai', isDemo: true },
   { id: 'u_bdu', role: 'university', name: 'Career Office (demo)', email: 'careers@bdu.example', universityId: 'uni_bdu', isDemo: true },
-  { id: 'u_verify', role: 'admin', name: 'Verification Team (demo)', email: 'verify@kaona.example', isDemo: true },
+  { id: 'u_verify', role: 'admin', name: 'Verification Team (demo)', email: 'verify@interngo.example', isDemo: true },
 ];
 
 function application(

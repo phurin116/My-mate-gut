@@ -14,19 +14,19 @@ type Extra = Pick<Startup, 'kind' | 'logo' | 'workplace' | 'benefits' | 'process
 
 const PROCESS = {
   startup: [
-    'Apply on Kaona with your profile and resume',
+    'Apply on InternGo with your profile and resume',
     'Short video call with a founder or team lead (about 20 minutes)',
     'Small practical task or a chat about your past work',
     'Decision within about two weeks',
   ],
   growing: [
-    'Apply on Kaona with your profile and resume',
+    'Apply on InternGo with your profile and resume',
     'The hiring team reviews applications each week',
     'Interview with your future supervisor',
     'Offer and internship agreement',
   ],
   established: [
-    'Apply on Kaona with your profile and resume',
+    'Apply on InternGo with your profile and resume',
     'The people team screens applications',
     'Interview with the hiring manager',
     'Short case or work sample',
@@ -145,7 +145,7 @@ export const COMPANY_EXTRAS: Record<string, Extra> = {
     products: ['Online houseplant shop', 'Care reminders through LINE'],
     workplace: 'Home-based shop with a small packing space in Chatuchak. Details not confirmed.',
     benefits: ['Not stated by the company'],
-    process: ['Apply on Kaona', 'The owner contacts shortlisted students'],
+    process: ['Apply on InternGo', 'The owner contacts shortlisted students'],
   },
   st_orbit: {
     kind: 'startup',
@@ -154,7 +154,7 @@ export const COMPANY_EXTRAS: Record<string, Extra> = {
     products: ['Online maths tutoring'],
     workplace: 'Not provided by the company.',
     benefits: ['Not stated by the company'],
-    process: ['Apply on Kaona', 'Not described by the company'],
+    process: ['Apply on InternGo', 'Not described by the company'],
   },
 };
 

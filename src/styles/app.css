@@ -2905,7 +2905,7 @@ a.stat:hover {
 }
 
 /* ==========================================================================
-   Kaona visual layer
+   InternGo visual layer
    Editorial serif headlines, hairline structure, tight corners, deep navy.
    ========================================================================== */
 
@@ -3489,4 +3489,8 @@ a.stat:hover {
 
 .hero-search .hero-select {
   color: var(--ink);
+}
+
+.site-footer .logo circle {
+  fill: var(--navy);
 }
